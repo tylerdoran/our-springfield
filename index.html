@@ -1,70 +1,95 @@
 <!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#f58bb7"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="default">
-<link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="donut.svg" type="image/svg+xml">
-<title>Our Springfield</title>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#f38db8"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="manifest" href="manifest.webmanifest"><title>Our Springfield</title>
 <style>
-:root{--pink:#f58bb7;--deep:#b94e80;--cream:#fff7e9;--ink:#3d3040;--green:#a8d69a}
-*{box-sizing:border-box}body{margin:0;background:#b9e4f0;color:var(--ink);font-family:system-ui,-apple-system,sans-serif}
-header{position:sticky;top:0;z-index:3;background:linear-gradient(100deg,#f7a4c7,#f7c0d7);padding:12px 14px calc(12px + env(safe-area-inset-top));box-shadow:0 2px 8px #74445b33}
-.top{display:flex;align-items:center;justify-content:space-between;gap:8px}.brand{font-weight:900;font-size:20px}.wallet{background:#fff9;border:1px solid #fff;border-radius:20px;padding:6px 10px;font-weight:800;font-size:13px}
-main{max-width:900px;margin:auto;padding:12px 12px 100px}.townbar{display:flex;justify-content:space-between;align-items:center;margin:8px 2px 12px}.townbar h2{margin:0;font-size:18px}
-button{border:0;border-radius:14px;padding:10px 13px;background:var(--deep);color:white;font-weight:750;font-size:14px;box-shadow:0 2px 0 #843657;cursor:pointer}button.secondary{background:#fff;color:var(--deep);box-shadow:0 2px 0 #e3a9c3}button:active{transform:translateY(1px);box-shadow:none}
-.world{position:relative;overflow:hidden;border:5px solid #fff;border-radius:22px;background:#a8d69a;box-shadow:0 6px 18px #315b5b33;min-height:410px}
-.grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;padding:12px;background:linear-gradient(135deg,#b5dc9f,#a0d18d)}
-.tile{aspect-ratio:1;border-radius:9px;background:#b7df9f;display:flex;align-items:center;justify-content:center;font-size:clamp(22px,6vw,42px);position:relative;border:1px solid #ffffff55;cursor:pointer;user-select:none}
-.tile:nth-child(3n){background:#abd593}.tile.road{background:#c9c4b6}.tile.selected{outline:3px solid #ffdf67;z-index:1}
-.tile small{position:absolute;bottom:2px;font-size:8px;background:#fff9;border-radius:5px;padding:1px 3px}
-.hint{font-size:12px;color:#49624b;text-align:center;padding:8px}
-.panel{background:var(--cream);border:2px solid white;border-radius:20px;padding:14px;margin-top:14px;box-shadow:0 4px 12px #3453}
-.panel h3{margin:0 0 10px}.tabs{display:flex;gap:7px;overflow:auto;padding:3px 0 10px}.tabs button{white-space:nowrap}.tabs button.active{background:#71415e}
-.items{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.item{background:white;border:1px solid #f0d9e4;border-radius:14px;padding:10px;display:flex;gap:9px;align-items:center;min-width:0}.emoji{font-size:29px}.item b{display:block;font-size:13px}.item small{color:#806d78}
-.item button{margin-left:auto;padding:8px;font-size:12px}
-.task{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px;background:white;border-radius:13px;margin:7px 0}.task .who{font-size:14px;font-weight:800}.task small{display:block;color:#806d78}
-nav{position:fixed;bottom:0;left:0;right:0;z-index:4;background:#fff9f2;border-top:1px solid #e8c9d8;display:flex;justify-content:space-around;padding:8px 4px calc(8px + env(safe-area-inset-bottom))}
-nav button{background:transparent;color:#70475c;box-shadow:none;padding:6px;font-size:12px;display:flex;flex-direction:column;align-items:center;gap:2px}nav button span{font-size:21px}
-.notice{font-size:12px;color:#76596a;line-height:1.45}
-.modal{position:fixed;inset:0;background:#24152588;display:none;align-items:center;justify-content:center;padding:20px;z-index:10}.modal.show{display:flex}.dialog{background:var(--cream);border-radius:20px;padding:18px;width:min(100%,420px);box-shadow:0 10px 40px #24152555}.dialog h3{margin-top:0}.dialog input{width:100%;padding:12px;border:1px solid #d9b9c9;border-radius:10px;margin:6px 0 12px;font:inherit}
-@media(min-width:650px){.items{grid-template-columns:repeat(3,minmax(0,1fr))}.grid{grid-template-columns:repeat(9,1fr)}}
-</style></head>
-<body>
-<header><div class="top"><div class="brand">🍩 Our Springfield</div><div class="wallet">💵 ∞ &nbsp; 🍩 ∞</div></div></header>
+:root{--pink:#f38db8;--plum:#76445f;--cream:#fff8ed;--ink:#382c36}
+*{box-sizing:border-box}body{margin:0;background:#d7e9ee;color:var(--ink);font-family:system-ui,-apple-system,sans-serif;overflow-x:hidden}
+header{height:64px;background:linear-gradient(90deg,#f7a6c7,#f8c2d8);display:flex;align-items:center;justify-content:space-between;padding:0 14px;box-shadow:0 2px 9px #49334535;position:relative;z-index:2}
+.brand{font-weight:950;font-size:19px}.balances{display:flex;gap:7px}.pill{background:#fff9;border:1px solid #fff;border-radius:20px;padding:6px 10px;font-size:13px;font-weight:900}
+main{max-width:1100px;margin:auto;padding:10px 10px 92px}.status{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:3px 2px 9px}.level{font-weight:900;font-size:14px}.xp{height:8px;background:#ffffffa8;border-radius:8px;overflow:hidden;width:110px;display:inline-block;vertical-align:middle;margin-left:5px}.xp i{display:block;background:#f0b83d;height:100%;width:12%}
+.scene{height:min(66vh,620px);min-height:390px;position:relative;border:4px solid #fff;border-radius:19px;overflow:hidden;background:#8ecb83;box-shadow:0 5px 18px #355a5140;touch-action:none}
+canvas{width:100%;height:100%;display:block;cursor:grab}canvas:active{cursor:grabbing}
+.hint{position:absolute;left:9px;bottom:8px;background:#fffdf0dd;border-radius:10px;padding:6px 9px;font-size:11px;color:#53634c;pointer-events:none}
+.panel{background:var(--cream);border:2px solid #fff;border-radius:18px;margin-top:11px;padding:12px;box-shadow:0 3px 10px #4a435018}.panel h3{margin:0 0 9px;font-size:16px}
+.toolbar{display:flex;gap:7px;overflow:auto;padding:1px 0 9px}.toolbar button,.actions button{white-space:nowrap;border:0;border-radius:12px;background:#87506d;color:white;font-weight:800;padding:9px 12px}
+.toolbar button.active{background:#382c36}.cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.card{background:white;border:1px solid #efd5e1;border-radius:13px;padding:9px;display:flex;align-items:center;gap:8px;min-width:0}.card .emoji{font-size:27px}.card b{font-size:12px;display:block}.card small{font-size:10px;color:#826b78}.card button{margin-left:auto;border:0;background:#f38db8;color:#4d2940;border-radius:9px;padding:7px;font-weight:900;font-size:11px}.locked{opacity:.48}
+.row{display:flex;align-items:center;justify-content:space-between;gap:8px}.notice{font-size:12px;color:#786472;line-height:1.45}
+.task{background:#fff;border-radius:11px;padding:9px;margin:6px 0;display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:13px}.task button{border:0;border-radius:9px;padding:8px 10px;background:#87506d;color:#fff;font-weight:800}
+nav{position:fixed;bottom:0;left:0;right:0;background:#fff9f1;border-top:1px solid #e5c5d4;display:flex;justify-content:space-around;padding:7px 3px calc(7px + env(safe-area-inset-bottom));z-index:3}nav button{border:0;background:none;color:#65465a;font-weight:800;font-size:11px;display:flex;flex-direction:column;align-items:center;gap:2px}nav span{font-size:21px}
+@media(min-width:700px){.cards{grid-template-columns:repeat(3,minmax(0,1fr))}.layout{display:grid;grid-template-columns:1.4fr 1fr;gap:12px}.layout .panel{margin-top:0}.layout .right .panel{margin-bottom:11px}.scene{height:650px}}
+</style></head><body>
+<header><div class="brand">🍩 OUR SPRINGFIELD</div><div class="balances"><div class="pill">💵 ∞</div><div class="pill">🍩 ∞</div></div></header>
 <main>
- <div class="townbar"><h2 id="townName">Your Town</h2><button class="secondary" onclick="renameTown()">✏️ Rename</button></div>
- <section class="world"><div class="grid" id="grid"></div><div class="hint">Tap an empty tile to select it, then choose a building below.</div></section>
- <section class="panel" id="buildPanel"><h3>🏗️ Build your town</h3><div class="tabs" id="tabs"></div><div class="items" id="catalog"></div></section>
- <section class="panel"><h3>🧍 Character tasks</h3><div id="tasks"></div></section>
- <section class="panel"><h3>👥 Friends</h3><p class="notice">Friend invitations become available when the online account service is connected. This prototype currently saves your town on this device.</p><button onclick="inviteInfo()">＋ Invite a friend</button></section>
- <section class="panel"><h3>⭐ Game settings</h3><p class="notice">Unlimited cash and donuts are enabled. This is an original fan-made town-building prototype, not an official Simpsons game.</p><button class="secondary" onclick="resetTown()">Reset this town</button></section>
+<div class="status"><div><span class="level" id="level">LEVEL 1</span><span class="xp"><i id="xpbar"></i></span> <small id="xptext">0 / 100 XP</small></div><strong id="townName">Your Town</strong></div>
+<div class="layout"><div>
+<div class="scene"><canvas id="town"></canvas><div class="hint">Drag to move · Pinch or scroll to zoom · Tap land to build</div></div>
+<div class="panel"><div class="row"><h3>📜 Current task</h3><small id="questCount">0 / 3</small></div><div id="quest" class="notice">Welcome! Place your first home to begin building your town.</div></div>
+</div><div class="right">
+<section class="panel"><h3>🏗️ Build menu</h3><div class="toolbar" id="tabs"></div><div class="cards" id="catalog"></div></section>
+<section class="panel"><h3>🧍 Residents</h3><div id="residents"></div></section>
+<section class="panel"><h3>👥 Friends</h3><p class="notice">Your own town is saved on this device for now. Online accounts, invitations, cloud saves, and town visits are the next multiplayer milestone.</p><button onclick="alert('Friend invitations will be enabled when the online account system is connected.')">＋ Invite friends</button></section>
+</div></div>
 </main>
-<nav><button onclick="scrollTo(0,0)"><span>🏡</span>Town</button><button onclick="document.getElementById('buildPanel').scrollIntoView({behavior:'smooth'})"><span>🏗️</span>Build</button><button onclick="document.getElementById('tasks').scrollIntoView({behavior:'smooth'})"><span>🧍</span>Tasks</button><button onclick="document.querySelectorAll('.panel')[2].scrollIntoView({behavior:'smooth'})"><span>👥</span>Friends</button></nav>
-<div class="modal" id="modal"><div class="dialog"><h3 id="modalTitle"></h3><p id="modalText" class="notice"></p><input id="modalInput" style="display:none"><div style="display:flex;gap:8px;justify-content:flex-end"><button class="secondary" onclick="closeModal()">Close</button><button id="modalOK" onclick="modalAction()">Okay</button></div></div></div>
+<nav><button onclick="window.scrollTo({top:0,behavior:'smooth'})"><span>🏡</span>Town</button><button onclick="document.getElementById('catalog').scrollIntoView({behavior:'smooth'})"><span>🏗️</span>Build</button><button onclick="document.getElementById('residents').scrollIntoView({behavior:'smooth'})"><span>🧍</span>Residents</button><button onclick="document.querySelector('.right .panel:last-child').scrollIntoView({behavior:'smooth'})"><span>👥</span>Friends</button></nav>
 <script>
-const buildings=[
-{cat:"Homes",name:"Cozy House",emoji:"🏠"},{cat:"Homes",name:"Family Home",emoji:"🏡"},{cat:"Homes",name:"Apartment Block",emoji:"🏢"},
-{cat:"Shops",name:"Corner Market",emoji:"🏪"},{cat:"Shops",name:"Coffee Shop",emoji:"☕"},{cat:"Shops",name:"Pizza Place",emoji:"🍕"},{cat:"Shops",name:"Movie Theater",emoji:"🎬"},
-{cat:"Civic",name:"Town Hall",emoji:"🏛️"},{cat:"Civic",name:"School",emoji:"🏫"},{cat:"Civic",name:"Fire Station",emoji:"🚒"},{cat:"Civic",name:"Hospital",emoji:"🏥"},
-{cat:"Parks",name:"Town Park",emoji:"🌳"},{cat:"Parks",name:"Fountain",emoji:"⛲"},{cat:"Parks",name:"Playground",emoji:"🛝"},{cat:"Parks",name:"Flower Garden",emoji:"🌷"},
-{cat:"Special",name:"Donut Shop",emoji:"🍩"},{cat:"Special",name:"Festival Stage",emoji:"🎪"},{cat:"Special",name:"Golden Statue",emoji:"🗽"}
+const canvas=document.getElementById('town'),ctx=canvas.getContext('2d');
+const TW=72,TH=36;
+const items=[
+{name:'Starter Cottage',cat:'Homes',emoji:'🏠',level:1,w:2,h:2,color:'#e9b18d'},
+{name:'Corner Home',cat:'Homes',emoji:'🏡',level:2,w:2,h:2,color:'#e8c1a0'},
+{name:'Small Apartments',cat:'Homes',emoji:'🏢',level:5,w:2,h:2,color:'#d6a7c9'},
+{name:'Corner Store',cat:'Shops',emoji:'🏪',level:2,w:2,h:2,color:'#e4b56f'},
+{name:'Coffee House',cat:'Shops',emoji:'☕',level:4,w:2,h:2,color:'#c99572'},
+{name:'Pizza Parlor',cat:'Shops',emoji:'🍕',level:6,w:2,h:2,color:'#dc8b65'},
+{name:'Community School',cat:'Civic',emoji:'🏫',level:3,w:3,h:2,color:'#e5cb78'},
+{name:'Town Clinic',cat:'Civic',emoji:'🏥',level:7,w:3,h:2,color:'#d9e5e8'},
+{name:'Little Park',cat:'Decor',emoji:'🌳',level:1,w:1,h:1,color:'#83b96c'},
+{name:'Flower Garden',cat:'Decor',emoji:'🌷',level:3,w:1,h:1,color:'#a4c978'},
+{name:'Town Fountain',cat:'Decor',emoji:'⛲',level:5,w:1,h:1,color:'#91d3dc'},
+{name:'Forest Camp',cat:'Special',emoji:'🏕️',level:8,w:3,h:2,color:'#a9c18a'}
 ];
-const people=[{name:"Mayor Maple",emoji:"🧑‍💼"},{name:"Riley",emoji:"🧑"},{name:"Casey",emoji:"👩"}];
-let state=JSON.parse(localStorage.getItem("ourSpringfield")||"null")||{town:"Your Town",placed:[],tasks:[]};
-let selected=0,category="All",modalFn=null;
-const save=()=>localStorage.setItem("ourSpringfield",JSON.stringify(state));
-function drawGrid(){const g=document.getElementById("grid");g.innerHTML="";for(let i=0;i<63;i++){let p=state.placed.find(x=>x.tile===i);let d=document.createElement("div");d.className="tile"+(selected===i?" selected":"")+(p&&p.emoji==="🛣️"?" road":"");d.innerHTML=p?`${p.emoji}<small>${p.name}</small>`:"";d.onclick=()=>{selected=i;drawGrid()};g.append(d)}}
-function drawCatalog(){let cats=["All",...new Set(buildings.map(x=>x.cat))];document.getElementById("tabs").innerHTML=cats.map(c=>`<button class="${c===category?'active':''}" onclick="category='${c}';drawCatalog()">${c}</button>`).join("");let list=buildings.filter(x=>category==="All"||x.cat===category);document.getElementById("catalog").innerHTML=list.map((b)=>`<div class="item"><div class="emoji">${b.emoji}</div><div><b>${b.name}</b><small>Free · Unlimited</small></div><button onclick="place('${b.name.replace(/'/g,"\\'")}','${b.emoji}')">Place</button></div>`).join("")}
-function place(name,emoji){if(state.placed.some(x=>x.tile===selected)){alert("That tile is occupied. Choose an empty tile first.");return}state.placed.push({tile:selected,name,emoji});save();drawGrid();selected=(selected+1)%63;drawGrid()}
-function drawTasks(){let el=document.getElementById("tasks");let now=Date.now();state.tasks=state.tasks.filter(t=>t.end>now);el.innerHTML=people.map(p=>{let task=state.tasks.find(t=>t.person===p.name);return `<div class="task"><div><div class="who">${p.emoji} ${p.name}</div><small>${task?`Working: ${task.job} · ${Math.ceil((task.end-now)/1000)} sec left`:"Ready for a task"}</small></div><button ${task?'disabled':''} onclick="startTask('${p.name}')">${task?'Working':'Start job'}</button></div>`}).join("");save()}
-function startTask(person){let job=prompt("Choose a task: Clean up (1 min), Visit neighbors (1 hour), Help at the shop (4 hours)","Clean up");if(!job)return;let mins=/hour/i.test(job)?60:1;state.tasks.push({person,job,end:Date.now()+mins*60000});drawTasks()}
-function renameTown(){showModal("Name your town","",true,()=>{let v=document.getElementById("modalInput").value.trim();if(v){state.town=v;document.getElementById("townName").textContent=v;save()}})}
-function inviteInfo(){showModal("Invite your friends","Online friend invitations aren't connected in this prototype yet. The next development step is adding secure accounts, a hosted database, and invite links so each friend can save and visit their own town.",false,()=>{})}
-function resetTown(){if(confirm("Reset this town on this device?")){state={town:"Your Town",placed:[],tasks:[]};save();init()}}
-function showModal(title,txt,input,fn){modalFn=fn;document.getElementById("modalTitle").textContent=title;document.getElementById("modalText").textContent=txt;document.getElementById("modalInput").style.display=input?"block":"none";document.getElementById("modal").classList.add("show")}
-function closeModal(){document.getElementById("modal").classList.remove("show")}
-function modalAction(){if(modalFn)modalFn();closeModal()}
-function init(){document.getElementById("townName").textContent=state.town;drawGrid();drawCatalog();drawTasks()}
-init();setInterval(drawTasks,1000);
-if("serviceWorker" in navigator && location.protocol.startsWith("http"))navigator.serviceWorker.register("./sw.js").catch(()=>{});
+const chars=[{name:'Mayor Maple',emoji:'🧑‍💼',level:1},{name:'Riley',emoji:'🧑',level:1},{name:'Casey',emoji:'👩',level:3},{name:'Coach Cedar',emoji:'🧔',level:6}];
+let s=JSON.parse(localStorage.getItem('os_iso_save')||'null')||{town:'Your Town',level:1,xp:0,placed:[],tasks:[],quests:0};
+let cat='All',chosen=null,scale=1,ox=0,oy=30,drag=null,lastTap=0;
+function save(){localStorage.setItem('os_iso_save',JSON.stringify(s))}
+function resize(){let r=canvas.getBoundingClientRect(),dpr=Math.min(devicePixelRatio||1,2);canvas.width=r.width*dpr;canvas.height=r.height*dpr;ctx.setTransform(dpr,0,0,dpr,0,0);draw()}
+function iso(x,y){return {x:(x-y)*TW/2,y:(x+y)*TH/2}}
+function project(x,y){let p=iso(x,y);return {x:canvas.clientWidth/2+p.x*scale+ox,y:canvas.clientHeight*.42+p.y*scale+oy}}
+function poly(points,fill,stroke='#719a65'){ctx.beginPath();points.forEach((p,i)=>i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y));ctx.closePath();ctx.fillStyle=fill;ctx.fill();ctx.strokeStyle=stroke;ctx.lineWidth=1;ctx.stroke()}
+function diamond(x,y,fill){let p=project(x,y);poly([{x:p.x,y:p.y},{x:p.x+TW/2*scale,y:p.y+TH/2*scale},{x:p.x,y:p.y+TH*scale},{x:p.x-TW/2*scale,y:p.y+TH/2*scale}],fill)}
+function drawBuilding(b){let p=project(b.x+b.w/2,b.y+b.h/2),w=(b.w+b.h)*TW/4*scale,h=(b.w+b.h)*TH/4*scale;let ht=30*scale;
+ // soft shadow and two walls
+ ctx.fillStyle='#4d624655';ctx.beginPath();ctx.ellipse(p.x,p.y+ht+4,w*.56,h*.45,0,0,Math.PI*2);ctx.fill();
+ poly([{x:p.x-w/2,y:p.y},{x:p.x,y:p.y+h/2},{x:p.x,y:p.y-ht+h/2},{x:p.x-w/2,y:p.y-ht}],b.color,'#8a6959');
+ poly([{x:p.x,y:p.y+h/2},{x:p.x+w/2,y:p.y},{x:p.x+w/2,y:p.y-ht},{x:p.x,y:p.y-ht+h/2}],shade(b.color),'#8a6959');
+ poly([{x:p.x-w/2,y:p.y-ht},{x:p.x,y:p.y-ht-h*.5},{x:p.x+w/2,y:p.y-ht},{x:p.x,y:p.y-ht+h*.5}], '#9b6849','#704b3d');
+ ctx.font=`${Math.max(15,25*scale)}px system-ui`;ctx.textAlign='center';ctx.fillText(b.emoji,p.x,p.y-ht*.18);
+}
+function shade(hex){return hex==='#e9b18d'?'#c78c70':'#b98470'}
+function draw(){let W=canvas.clientWidth,H=canvas.clientHeight;ctx.clearRect(0,0,W,H);ctx.fillStyle='#91ce84';ctx.fillRect(0,0,W,H);
+ for(let y=0;y<18;y++)for(let x=0;x<22;x++){let col=((x+y)%2)?'#91ce84':'#8bc77d';diamond(x,y,col)}
+ // water strip / trees for visual depth
+ for(let i=0;i<7;i++){let p=project(14+i,2);ctx.fillStyle='#73c7dc';ctx.fillRect(p.x-5,p.y-8,10,34)}
+ for(let i=0;i<9;i++){let x=(i*3+2)%20,y=(i*5+1)%14,p=project(x,y);ctx.font=`${24*scale}px system-ui`;ctx.fillText('🌲',p.x,p.y)}
+ // road path in diamond tile coordinates
+ [[2,8],[3,8],[4,8],[5,8],[6,8],[7,8],[8,8],[9,8],[10,8],[10,7],[10,6],[10,5]].forEach(([x,y])=>diamond(x,y,'#b9b6ae'));
+ // sidewalk edge
+ s.placed.slice().sort((a,b)=>(a.x+a.y)-(b.x+b.y)).forEach(drawBuilding);
+ // town residents as small original emoji tokens
+ chars.filter(c=>c.level<=s.level).forEach((c,i)=>{let p=project(4+i*2,7+(i%2));ctx.font=`${21*scale}px system-ui`;ctx.fillText(c.emoji,p.x,p.y-8*scale)});
+ // selected cursor
+ if(chosen){let p=project(chosen.x,chosen.y);ctx.strokeStyle='#ffe16b';ctx.lineWidth=3;ctx.beginPath();ctx.ellipse(p.x,p.y,TW*.55*scale,TH*.55*scale,0,0,Math.PI*2);ctx.stroke()}
+}
+function hitTile(px,py){let best=null,dist=1e9;for(let y=0;y<18;y++)for(let x=0;x<22;x++){let p=project(x+.5,y+.5),d=Math.hypot((px-p.x)/scale,(py-p.y)/scale);if(d<dist){dist=d;best={x,y}}}return dist<40?best:null}
+let startPt=null;
+canvas.addEventListener('pointerdown',e=>{canvas.setPointerCapture(e.pointerId);startPt={x:e.clientX,y:e.clientY,ox,oy};drag=true});
+canvas.addEventListener('pointerup',e=>{if(!drag)return;drag=false;let dx=e.clientX-startPt.x,dy=e.clientY-startPt.y;if(Math.hypot(dx,dy)>7){ox+=dx;oy+=dy;draw();return}let r=canvas.getBoundingClientRect(),t=hitTile(e.clientX-r.left,e.clientY-r.top);if(!t)return;chosen=t;if(chosen&&window.pendingBuild){placePending(t);window.pendingBuild=null}draw()});
+canvas.addEventListener('wheel',e=>{e.preventDefault();scale=Math.max(.65,Math.min(1.8,scale+(e.deltaY<0?.08:-.08)));draw()},{passive:false});
+function placePending(t){let b=window.pendingBuild;if(s.placed.some(p=>Math.abs(p.x-t.x)<b.w&&Math.abs(p.y-t.y)<b.h)){alert('That space is occupied. Choose another spot.');return}s.placed.push({...b,x:t.x,y:t.y});s.xp+=25;s.quests=Math.min(3,s.quests+1);save();refresh();draw()}
+function buildMenu(){let cats=['All',...new Set(items.map(i=>i.cat))];document.getElementById('tabs').innerHTML=cats.map(c=>`<button class="${c===cat?'active':''}" onclick="cat='${c}';buildMenu()">${c}</button>`).join('');let arr=items.filter(i=>cat==='All'||i.cat===cat);document.getElementById('catalog').innerHTML=arr.map(b=>`<div class="card ${b.level>s.level?'locked':''}"><div class="emoji">${b.emoji}</div><div><b>${b.name}</b><small>${b.level>s.level?'Unlocks at level '+b.level:'Free · Level '+b.level}</small></div><button ${b.level>s.level?'disabled':''} onclick="selectBuild('${b.name}')">${b.level>s.level?'Locked':'Place'}</button></div>`).join('')}
+function selectBuild(name){let b=items.find(x=>x.name===name);window.pendingBuild=b;alert('Tap an open spot on the town map to place '+name+'.')}
+function refresh(){document.getElementById('level').textContent='LEVEL '+s.level;document.getElementById('xptext').textContent=s.xp+' / '+(s.level*100)+' XP';document.getElementById('xpbar').style.width=Math.min(100,s.xp/(s.level*100)*100)+'%';while(s.xp>=s.level*100){s.xp-=s.level*100;s.level++}document.getElementById('townName').textContent=s.town;document.getElementById('questCount').textContent=s.quests+' / 3';document.getElementById('quest').textContent=s.quests>=3?'First neighborhood started! Keep placing buildings and unlock new content as you level up.':'Place '+(3-s.quests)+' more building(s) to complete your first town-building task.';document.getElementById('residents').innerHTML=chars.map(c=>`<div class="task"><span>${c.emoji} ${c.name} ${c.level>s.level?'🔒':''}<small style="display:block;color:#806d78"> ${c.level>s.level?'Unlocks at level '+c.level:'Available · Tasks coming next'}</small></span><b>${c.level<=s.level?'Ready':'Locked'}</b></div>`).join('');buildMenu();save()}
+function init(){resize();refresh();draw()}window.addEventListener('resize',resize);init();
 </script></body></html>

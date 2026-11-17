@@ -3,8 +3,8 @@
   "short_name": "Springfield",
   "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#b9e4f0",
-  "theme_color": "#f58bb7",
+  "background_color": "#d7e9ee",
+  "theme_color": "#f38db8",
   "icons": [
     {
       "src": "donut.svg",
