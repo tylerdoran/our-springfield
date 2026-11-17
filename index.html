@@ -128,7 +128,7 @@ nav{position:fixed;bottom:0;left:0;right:0;background:#fff9f1;border-top:1px sol
 <div class="economy-hud"><div class="hud-pill">💵 CASH&nbsp; ∞</div><div class="hud-pill">🍩 DONUTS&nbsp; ∞</div></div>
 <div class="level-hud"><div class="level-line"><span id="hudLevel">LEVEL 1</span><span id="hudXpText">0 / 100 XP</span></div><div class="xp-track"><i id="hudXpBar"></i></div></div>
 <button class="taskbook-button" onclick="openTaskBook()" aria-label="Open task book">📖<em id="taskBadge">!</em></button>
-<div class="action-dock"><button onclick="openLandMenu()" aria-label="Expand land">🗺️</button><button onclick="openPanel('build')" aria-label="Build">🏗️</button><button onclick="openPanel('residents')" aria-label="Characters">👥</button><button onclick="openPanel('income')" aria-label="Town management">🔨</button></div>
+<div class="action-dock"><button onclick="openStorage()" aria-label="Building storage">📦</button><button onclick="openLandMenu()" aria-label="Expand land">🗺️</button><button onclick="openPanel('build')" aria-label="Build">🏗️</button><button onclick="openPanel('residents')" aria-label="Characters">👥</button><button onclick="openPanel('income')" aria-label="Town management">🔨</button></div>
 <div class="menu-shade" id="taskShade" onclick="closeTaskBook()"><div class="taskbook-sheet" onclick="event.stopPropagation()"><button class="taskbook-close" onclick="closeTaskBook()">✕</button><h2>📖 Tasks & Quests</h2><button class="new-game-menu" onclick="newGame()">🔄 New Game (start from beginning)</button><div id="taskBookContent"></div></div></div>
 <nav><button onclick="closePanel()"><span>🏡</span>Town</button><button onclick="openPanel('build')"><span>🏗️</span>Build</button><button onclick="openPanel('residents')"><span>🧍</span>Residents</button><button onclick="openPanel('income')"><span>💰</span>Income</button><button onclick="openPanel('friends')"><span>👥</span>Friends</button></nav>
 
@@ -499,7 +499,7 @@ function finishPointer(e,cancelled=false){
  if(moveMode&&selectedBuilding>=0){let t=hitTile(px,py);if(t){let b=s.placed[selectedBuilding],bw=b.rotation%2?b.h:b.w,bh=b.rotation%2?b.w:b.h;if(!footprintOwned(t.x,t.y,bw,bh)){alert('Buy this land before moving here.');startPt=null;return}if(!occupied(t.x,t.y,bw,bh,selectedBuilding)){b.x=t.x;b.y=t.y;save();moveMode=false;selectedBuilding=-1;chosen=null;refresh();requestDraw()}else alert('That space is occupied.')}startPt=null;return}
  if(!window.pendingBuild){const resident=hitResident(px,py);if(resident){openCharacter(resident);startPt=null;return}}
  let hit=-1;for(let i=s.placed.length-1;i>=0;i--){let b=s.placed[i],bw=b.rotation%2?b.h:b.w,bh=b.rotation%2?b.w:b.h,p=project(b.x+bw/2,b.y+bh/2);if(Math.hypot(px-p.x,py-(p.y-12*scale))<34*scale){hit=i;break}}
- if(hit>=0){selectedBuilding=hit;chosen={x:s.placed[hit].x,y:s.placed[hit].y};requestDraw();startPt=null;return}
+ if(hit>=0){selectedBuilding=hit;chosen={x:s.placed[hit].x,y:s.placed[hit].y};requestDraw();openBuildingDetails(hit);startPt=null;return}
  let t=hitTile(px,py);if(!t){chosen=null;requestDraw();startPt=null;return}
  if(!landOwned(t.x,t.y)){if(landAdjacent(Math.floor(t.x/PLOT),Math.floor(t.y/PLOT)))openLandMenu();else alert('Expand into neighboring land first.');startPt=null;return}
  if(window.pendingBuild){placePending(t)}else{chosen=null;selectedBuilding=-1}
@@ -511,9 +511,9 @@ canvas.addEventListener('lostpointercapture',e=>finishPointer(e,true));
 canvas.addEventListener('contextmenu',e=>e.preventDefault());
 canvas.addEventListener('wheel',e=>{e.preventDefault();zoomAt(scale*Math.exp(-e.deltaY*.001),e.clientX,e.clientY)},{passive:false});
 function occupied(x,y,w,h,ignore=-1){return s.placed.some((p,i)=>{if(i===ignore)return false;let pw=p.rotation%2?p.h:p.w,ph=p.rotation%2?p.w:p.h;return x<p.x+pw&&x+w>p.x&&y<p.y+ph&&y+h>p.y})}
-function placePending(t){let b=window.pendingBuild,bw=rotateNext?b.h:b.w,bh=rotateNext?b.w:b.h;if(!footprintOwned(t.x,t.y,bw,bh)){alert('This building needs more unlocked land. Expand your town first.');return}if(occupied(t.x,t.y,bw,bh)){alert('That space is occupied. Choose another spot.');return}window.pendingBuild=null;s.placed.push({...b,x:t.x,y:t.y,rotation:rotateNext?1:0,lastCollected:Date.now()});rotateNext=false;s.xp+=25;s.quests=Math.min(3,s.quests+1);save();storyComplete('build',b.name);eventComplete('build',b.name);refresh();draw()}
+function placePending(t){let b=window.pendingBuild,bw=rotateNext?b.h:b.w,bh=rotateNext?b.w:b.h;if(!footprintOwned(t.x,t.y,bw,bh)){alert('This building needs more unlocked land. Expand your town first.');return}if(occupied(t.x,t.y,bw,bh)){alert('That space is occupied. Choose another spot.');return}const fromStorage=Number.isInteger(window.pendingStoredIndex);if(fromStorage){s.storage.splice(window.pendingStoredIndex,1);delete window.pendingStoredIndex}window.pendingBuild=null;s.placed.push({...b,x:t.x,y:t.y,rotation:rotateNext?1:0,lastCollected:Date.now()});rotateNext=false;if(!fromStorage){s.xp+=25;s.quests=Math.min(3,s.quests+1)}save();if(!fromStorage){storyComplete('build',b.name);eventComplete('build',b.name)}refresh();draw()}
 function buildMenu(){let cats=['All',...new Set(items.map(i=>i.cat))];let tabs=cats.map(c=>`<button class="${c===cat?'active':''}" onclick="cat='${c}';buildMenu()">${c}</button>`).join('');let arr=items.filter(i=>cat==='All'||i.cat===cat);let cards=arr.map(b=>`<div class="card ${!canBuild(b)?'locked':''}"><div class="emoji">${b.emoji}</div><div><b>${b.name}</b><small>${!canBuild(b)?(b.event&&s.activeEvent!==b.event?'Activate '+b.event+' event':b.level>s.level?'Unlocks at level '+b.level:'Unlock through story'):'Free · Level '+b.level}</small></div><button ${!canBuild(b)?'disabled':''} onclick="selectBuild('${b.name}')">${!canBuild(b)?'Locked':'Place'}</button></div>`).join('');document.querySelectorAll('#tabs').forEach(el=>el.innerHTML=tabs+'<button onclick="openEvents()">🎉 Events</button>');document.querySelectorAll('#catalog').forEach(el=>el.innerHTML=cards)}
-function selectBuild(name){let b=items.find(x=>x.name===name);if(!b||!canBuild(b)){alert('Keep following the story to unlock this building.');return}window.pendingBuild=b;closePanel();alert('Tap an open spot on the town map to place '+name+'.')}
+function selectBuild(name){delete window.pendingStoredIndex;let b=items.find(x=>x.name===name);if(!b||!canBuild(b)){alert('Keep following the story to unlock this building.');return}window.pendingBuild=b;closePanel();alert('Tap an open spot on the town map to place '+name+'.')}
 function refresh(){document.getElementById('level').textContent='LEVEL '+s.level;while(s.xp>=s.level*100){s.xp-=s.level*100;s.level++}document.getElementById('xptext').textContent=s.xp+' / '+(s.level*100)+' XP';document.getElementById('xpbar').style.width=Math.min(100,s.xp/(s.level*100)*100)+'%';document.getElementById('hudLevel').textContent='LEVEL '+s.level;document.getElementById('hudXpText').textContent=s.xp+' / '+(s.level*100)+' XP';document.getElementById('hudXpBar').style.width=Math.min(100,s.xp/(s.level*100)*100)+'%';document.getElementById('taskBadge').textContent='!';document.getElementById('townName').textContent=s.town;document.getElementById('questCount').textContent='Chapter '+(s.storyStage+1);document.getElementById('quest').textContent=activeStory().objective;renderResidents();renderIncome();buildMenu();renderCharacterRail();save();if(s.storyStage===6&&s.level>=3){s.storyStage=7;save();setTimeout(storyModal,300)}else if(activeStory().type==='level'&&s.level>=Number(activeStory().target)){s.xp+=activeStory().reward;s.storyStage++;save();setTimeout(storyModal,300)}}
 
 const taskChoices=[{label:'1 minute',ms:60000,xp:5},{label:'1 hour',ms:3600000,xp:15},{label:'4 hours',ms:14400000,xp:35},{label:'8 hours',ms:28800000,xp:60},{label:'24 hours',ms:86400000,xp:120}];
@@ -523,6 +523,36 @@ function startTask(name,index){let c=chars.find(c=>c.name===name);if(!c||!isChar
 function collectTask(name){let t=s.tasks[name];if(!t||Date.now()<t.endsAt)return;s.xp+=t.xp;delete s.tasks[name];storyComplete('task',name);refresh();draw()}
 function renderIncome(){let now=Date.now();document.getElementById('income').innerHTML=s.placed.length?s.placed.map((b,i)=>{let elapsed=now-(b.lastCollected||now),ready=Math.floor(elapsed/(b.interval||60000)),amount=ready*(b.income||10);return `<div class="task"><div style="flex:1"><b>${b.emoji} ${b.name}</b><div class="subtle">${amount>0?'$'+amount+' ready to collect':'Next payout in '+fmt((b.interval||60000)-(elapsed%(b.interval||60000)))}</div></div><button onclick="collectIncome(${i})" ${amount<=0?'disabled style="opacity:.45"':''}>Collect</button></div>`}).join(''):'<p class="notice">Place buildings to start earning town income.</p>'}
 function collectIncome(i){let b=s.placed[i];if(!b)return;let now=Date.now(),n=Math.floor((now-(b.lastCollected||now))/(b.interval||60000));if(n<1)return;let earned=n*(b.income||10);b.lastCollected=(b.lastCollected||now)+n*(b.interval||60000);s.xp+=Math.max(1,Math.floor(earned/10));save();storyComplete('income');refresh();draw();alert('Collected $'+earned+' and earned XP!')}
+// v2.0: tap a placed building to manage it, collect its earnings, or move it.
+function openBuildingDetails(i){
+ const b=s.placed[i];if(!b)return;
+ selectedBuilding=i;
+ const elapsed=Math.max(0,Date.now()-(b.lastCollected||Date.now()));
+ const interval=b.interval||60000,cycles=Math.floor(elapsed/interval),earned=cycles*(b.income||10);
+ const content=document.getElementById('sheetContent');
+ document.getElementById('sheetTitle').textContent=(b.emoji||'🏠')+' '+b.name;
+ content.innerHTML='<div class="character-profile"><div class="character-avatar">'+(b.emoji||'🏠')+'</div><div><b>'+b.name+'</b><p>Level '+b.level+' · '+b.cat+' · '+b.w+' × '+b.h+' tiles</p><p>Earns $'+(b.income||10)+' every '+Math.round(interval/60000)+' minute(s)</p></div></div>'+
+ '<div class="task"><div><b>'+ (earned?'$'+earned+' ready!':'Income collecting')+'</b><div class="subtle">'+(earned?'Tap collect to earn XP':'Next payout: '+fmt(interval-elapsed%interval))+'</div></div><button '+(!earned?'disabled':'')+' onclick="collectIncome('+i+');openBuildingDetails('+i+')">Collect</button></div>'+
+ '<div class="mini-actions" style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap"><button onclick="closePanel();beginMove()">↔ Move</button><button onclick="rotateSelected();openBuildingDetails('+i+')">⟳ Rotate</button><button onclick="storeBuilding('+i+')">📦 Store</button></div>'+
+ '<p class="notice">Tap Move, then tap an empty owned tile to reposition this building. Stored buildings can be placed again from your inventory.</p>';
+ document.getElementById('menuShade').classList.add('open');
+}
+function storeBuilding(i){
+ const b=s.placed[i];if(!b||!confirm('Put '+b.name+' in storage? You can place it again later.'))return;
+ if(!Array.isArray(s.storage))s.storage=[];
+ s.storage.push({...b});s.placed.splice(i,1);selectedBuilding=-1;chosen=null;save();refresh();requestDraw();openStorage();
+}
+function openStorage(){
+ if(!Array.isArray(s.storage))s.storage=[];
+ document.getElementById('sheetTitle').textContent='📦 Building Storage';
+ document.getElementById('sheetContent').innerHTML='<p class="notice">Buildings in storage are safe, but do not produce income. Place them back on unlocked land whenever you want.</p>'+(s.storage.length?s.storage.map((b,i)=>'<div class="task"><div><b>'+(b.emoji||'🏠')+' '+b.name+'</b><div class="subtle">'+b.w+' × '+b.h+' tiles</div></div><button onclick="restoreBuilding('+i+')">Place</button></div>').join(''):'<p class="notice">Your storage is empty.</p>');
+ document.getElementById('menuShade').classList.add('open');
+}
+function restoreBuilding(i){
+ const b=s.storage&&s.storage[i];if(!b)return;
+ window.pendingStoredIndex=i;window.pendingBuild=b;rotateNext=!!(b.rotation%2);closePanel();
+ alert('Tap an open spot on your owned land to place '+b.name+' from storage.');
+}
 function rotateSelected(){if(selectedBuilding>=0){let b=s.placed[selectedBuilding],next=(b.rotation+1)%2,w=next?b.h:b.w,h=next?b.w:b.h;if(!footprintOwned(b.x,b.y,w,h)||occupied(b.x,b.y,w,h,selectedBuilding)){alert('Not enough free unlocked land to rotate.');return}b.rotation=next;save();draw();refresh()}else if(window.pendingBuild){rotateNext=!rotateNext;alert('Next building placement: '+(rotateNext?'rotated':'normal orientation'))}else alert('Select a placed building or choose one from Build first.')}
 function beginMove(){if(selectedBuilding<0){alert('Tap a building on the map first, then choose Move.');return}moveMode=true;alert('Tap an open tile to move the selected building.')}
 
