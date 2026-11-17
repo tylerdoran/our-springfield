@@ -16,3 +16,7 @@ This remains a front-end prototype. Town data is stored on each device. Online a
 
 
 Version 0.4 update: landscape-first iPhone layout with a rotate-your-phone prompt in portrait, a wider town view, and a cached terrain layer to reduce repeated canvas drawing. Building placement hit detection is more forgiving, and the service worker cache has been versioned so updated files replace the older cached app.
+
+
+## Version 0.6
+The landscape town map now fills the entire screen behind the interface. The top balances and level/XP, quest panel, move/rotate controls, and bottom navigation remain visible as overlays. Build and other menus open over the town.

@@ -56,6 +56,28 @@ nav{position:fixed;bottom:0;left:0;right:0;background:#fff9f1;border-top:1px sol
  #sheetContent .cards{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}#sheetContent .card{padding:7px}#sheetContent .task{padding:7px;margin:4px 0}
 }
 @media (orientation:portrait) and (max-width:700px){.menu-shade{display:none!important}}
+
+/* v0.6: true full-screen town with persistent on-screen HUD */
+@media (orientation:landscape) and (max-height:700px) {
+ html,body{width:100%;height:100%;overflow:hidden}
+ header{position:fixed;top:0;left:0;right:0;height:40px;z-index:5;background:linear-gradient(90deg,#f7a6c7ee,#f8c2d8dd);backdrop-filter:blur(7px);pointer-events:none}
+ main{position:fixed;inset:0;width:100%;height:100dvh;max-width:none;margin:0;padding:0;overflow:hidden;z-index:1;pointer-events:none}
+ .status{position:fixed;z-index:6;top:44px;left:10px;right:10px;height:25px;margin:0;padding:3px 8px;border-radius:10px;background:#fff8eddf;box-shadow:0 2px 7px #263b2930;pointer-events:none}
+ .layout{display:block!important;width:100%;height:100%!important;margin:0}
+ .town-area{position:absolute;inset:0;width:100%;height:100%;min-height:0}
+ .scene{position:absolute;inset:0;width:100%;height:100%!important;min-height:0!important;border:0!important;border-radius:0!important;box-shadow:none!important;background:#8ecb83;overflow:hidden;pointer-events:auto}
+ canvas{width:100%;height:100%;touch-action:none}
+ .hint{left:10px;bottom:50px;z-index:4;opacity:.88}
+ .quest-float{position:fixed;left:10px;top:76px;width:min(245px,32vw);z-index:6;background:#fff8eddf;border:1px solid #fff;border-radius:10px;padding:7px 9px;box-shadow:0 2px 7px #263b2930;pointer-events:none}
+ .quest-float b{font-size:11px}.quest-float small{float:right;font-size:10px}.quest-float .notice{font-size:10px;margin-top:3px;line-height:1.25}
+ .build-controls{position:fixed;right:10px;top:76px;z-index:7;display:flex;gap:5px;pointer-events:auto}
+ .build-controls button{border:0;border-radius:9px;padding:7px 10px;background:#87506d;color:#fff;font-weight:800;font-size:11px;box-shadow:0 2px 5px #24192335}
+ .right{display:none!important}
+ nav{position:fixed;left:0;right:0;bottom:0;height:46px;z-index:8;padding:3px 4px calc(3px + env(safe-area-inset-bottom));background:#fff9f1ed;backdrop-filter:blur(9px);pointer-events:auto}
+ nav button{font-size:10px}nav span{font-size:19px}
+ .menu-shade{z-index:12;inset:40px 0 46px;background:#24192366}
+ .menu-sheet{width:min(760px,96vw);max-height:88%;padding:10px 14px 14px}
+}
 </style></head><body>
 <header><div class="brand">🍩 OUR SPRINGFIELD</div><div class="balances"><div class="pill">💵 ∞</div><div class="pill">🍩 ∞</div></div></header>
 <main>
