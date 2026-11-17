@@ -2,7 +2,7 @@
 <html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#f38db8"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="default">
-<link rel="manifest" href="manifest.webmanifest"><title>Our Springfield</title>
+<link rel="manifest" href="manifest.webmanifest"><title>Our Springfield v1.5</title>
 <style>
 :root{--pink:#f38db8;--plum:#76445f;--cream:#fff8ed;--ink:#382c36}
 *{box-sizing:border-box}body{margin:0;background:#d7e9ee;color:var(--ink);font-family:system-ui,-apple-system,sans-serif;overflow:hidden;height:100dvh}
@@ -107,12 +107,15 @@ nav{position:fixed;bottom:0;left:0;right:0;background:#fff9f1;border-top:1px sol
  .taskbook-close{float:right;border:0;border-radius:6px;background:#4c3d2c;color:white;padding:5px 9px;font-weight:900}
 }
 @media (orientation:landscape) and (max-height:700px){.character-rail{display:flex}.economy-hud,.level-hud,.taskbook-button,.action-dock{display:flex}.level-hud{display:block}.taskbook-button{display:block}}
+
+.story-shade{position:fixed;inset:0;z-index:50;background:#151d27bd;display:none;align-items:center;justify-content:center;padding:18px}.story-shade.open{display:flex}.story-card{width:min(460px,92vw);max-height:82vh;overflow:auto;background:#fff5d6;border:4px solid #553f2b;border-radius:18px;box-shadow:0 12px 0 #3c3024,0 20px 60px #0008;padding:20px;color:#352b23;text-align:center}.story-card h2{font-size:24px;margin:6px}.story-face{font-size:50px}.story-card p{font-size:15px;line-height:1.5}.story-card button,.story-action{background:#f4c947;border:2px solid #6b4a24;border-radius:12px;padding:10px 18px;font-weight:900;cursor:pointer}.story-reset{position:fixed;top:43px;right:8px;z-index:10;border-radius:8px;background:#fff8;border:1px solid #555;padding:4px 7px;font-size:10px}
+.new-game-menu{display:block;margin:6px 0 12px;padding:9px 12px;background:#f6d7e4;border:2px solid #87506d;border-radius:10px;color:#57334a;font-weight:850;cursor:pointer;font-size:13px}
 </style></head><body>
 <header><div class="brand">🍩 OUR SPRINGFIELD</div><div class="balances"><div class="pill">💵 ∞</div><div class="pill">🍩 ∞</div></div></header>
 <main>
 <div class="status"><div><span class="level" id="level">LEVEL 1</span><span class="xp"><i id="xpbar"></i></span> <small id="xptext">0 / 100 XP</small></div><strong id="townName">Your Town</strong></div>
 <div class="layout"><div class="town-area">
-<div class="scene"><canvas id="town"></canvas><div class="hint">Drag to move around · Pinch to zoom · Tap a building to select</div><div class="quest-float"><b>📜 Current task</b><small id="questCount">0 / 3</small><div id="quest" class="notice">Welcome! Place your first home to begin building your town.</div></div><div class="build-controls"><button onclick="beginMove()">↔ Move</button><button onclick="rotateSelected()">⟳ Rotate</button></div></div>
+<div class="scene"><canvas id="town"></canvas><div class="hint">Drag to move · Pinch to zoom · Cartoon residents now walk around town</div><div class="quest-float"><b>📜 Current task</b><small id="questCount">0 / 3</small><div id="quest" class="notice">Welcome! Place your first home to begin building your town.</div></div><div class="build-controls"><button onclick="beginMove()">↔ Move</button><button onclick="rotateSelected()">⟳ Rotate</button></div></div>
 </div><div class="right" id="gamePanels">
 <section class="panel"><h3>🏗️ Build menu</h3><div class="toolbar" id="tabs"></div><div class="cards" id="catalog"></div></section>
 <section class="panel"><h3>🧍 Residents & tasks</h3><div id="residents"></div></section><section class="panel"><h3>💰 Building income</h3><div id="income"></div></section>
@@ -125,8 +128,10 @@ nav{position:fixed;bottom:0;left:0;right:0;background:#fff9f1;border-top:1px sol
 <div class="level-hud"><div class="level-line"><span id="hudLevel">LEVEL 1</span><span id="hudXpText">0 / 100 XP</span></div><div class="xp-track"><i id="hudXpBar"></i></div></div>
 <button class="taskbook-button" onclick="openTaskBook()" aria-label="Open task book">📖<em id="taskBadge">!</em></button>
 <div class="action-dock"><button onclick="openPanel('build')" aria-label="Build">🏗️</button><button onclick="openPanel('residents')" aria-label="Characters">👥</button><button onclick="openPanel('income')" aria-label="Town management">🔨</button></div>
-<div class="menu-shade" id="taskShade" onclick="closeTaskBook()"><div class="taskbook-sheet" onclick="event.stopPropagation()"><button class="taskbook-close" onclick="closeTaskBook()">✕</button><h2>📖 Tasks & Quests</h2><div id="taskBookContent"></div></div></div>
+<div class="menu-shade" id="taskShade" onclick="closeTaskBook()"><div class="taskbook-sheet" onclick="event.stopPropagation()"><button class="taskbook-close" onclick="closeTaskBook()">✕</button><h2>📖 Tasks & Quests</h2><button class="new-game-menu" onclick="newGame()">🔄 New Game (start from beginning)</button><div id="taskBookContent"></div></div></div>
 <nav><button onclick="closePanel()"><span>🏡</span>Town</button><button onclick="openPanel('build')"><span>🏗️</span>Build</button><button onclick="openPanel('residents')"><span>🧍</span>Residents</button><button onclick="openPanel('income')"><span>💰</span>Income</button><button onclick="openPanel('friends')"><span>👥</span>Friends</button></nav>
+
+<div class="story-shade" id="storyShade"><div class="story-card"><div class="story-face" id="storyFace">🏙️</div><h2 id="storyTitle">Welcome</h2><p id="storyText"></p><button id="storyButton" onclick="closeStory()">Let's go!</button></div></div>
 <div class="rotate-prompt"><div><span class="phone">📱↻</span><b>Turn your phone sideways</b><p>Our Springfield is designed to be played horizontally. Rotate your iPhone to landscape to continue.</p></div></div>
 <script>
 const canvas=document.getElementById('town'),ctx=canvas.getContext('2d');
@@ -146,7 +151,32 @@ const items=[
 {name:'Forest Camp',income:80,interval:240000,cat:'Special',emoji:'🏕️',level:8,w:3,h:2,color:'#a9c18a'}
 ];
 const chars=[{name:'Mayor Maple',emoji:'🧑‍💼',level:1},{name:'Riley',emoji:'🧑',level:1},{name:'Casey',emoji:'👩',level:3},{name:'Coach Cedar',emoji:'🧔',level:6}];
-let s=JSON.parse(localStorage.getItem('os_iso_save')||'null')||{town:'Your Town',level:1,xp:0,placed:[],tasks:{},quests:0};
+// One-time forced new-game migration for v1.5: reset even if the v1.3 marker was already set.
+// The migration flag prevents clearing progress again on future launches.
+const RESET_FLAG='os_fresh_start_v15';
+if(localStorage.getItem(RESET_FLAG)!=='complete'){
+ localStorage.removeItem('os_iso_save');
+ localStorage.setItem(RESET_FLAG,'complete');
+}
+let s=JSON.parse(localStorage.getItem('os_iso_save')||'null')||{town:'Your Town',level:1,xp:0,placed:[],tasks:{},quests:0,storyStage:0,storySeen:false};
+const STORY=[
+ {title:'A Town to Rebuild',face:'🏙️',speaker:'Mayor Maple',dialogue:'Well, that was a spectacular mess. The old town is gone, but we have a patch of land and a lot of determination. Let’s start with one little home.',objective:'Place a Starter Cottage',type:'build',target:'Starter Cottage',reward:40},
+ {title:'A New Neighbor',face:'🧑',speaker:'Riley',dialogue:'A roof! Actual walls! I could get used to this. Give me a minute to unpack, and I’ll help get the town going.',objective:'Send Riley on a 1-minute task and collect the reward',type:'task',target:'Riley',reward:45},
+ {title:'Make It Green',face:'🌳',speaker:'Mayor Maple',dialogue:'A town needs more than buildings. Let’s give everyone a place to relax. A little park should do nicely.',objective:'Place a Little Park',type:'build',target:'Little Park',reward:60},
+ {title:'The First Payday',face:'💰',speaker:'Riley',dialogue:'These buildings are already making money. Collect a payout to keep our little town moving.',objective:'Collect income from any building',type:'income',reward:60},
+ {title:'Room to Grow',face:'🏡',speaker:'Mayor Maple',dialogue:'People are starting to notice us! Build a Corner Home so another family can move in.',objective:'Place a Corner Home',type:'build',target:'Corner Home',reward:90},
+ {title:'A Real Neighborhood',face:'🏪',speaker:'Riley',dialogue:'We’ve got neighbors, a park, and a little cash flow. A Corner Store would make this place feel like a real town.',objective:'Place a Corner Store',type:'build',target:'Corner Store',reward:110},
+ {title:'The Town Continues',face:'🎉',speaker:'Mayor Maple',dialogue:'Look at what we’ve started! Keep earning XP, assigning tasks, and unlocking new buildings as you grow.',objective:'Keep growing your town and unlocking levels',type:'free',reward:0}
+];
+if(s.storyStage===undefined){s.storyStage=s.placed.length?STORY.length-1:0;s.storySeen=!!s.placed.length;}
+function activeStory(){return STORY[Math.min(s.storyStage,STORY.length-1)]}
+function isCharacterUnlocked(c){return c.level<=s.level&&(c.name!=='Riley'||s.storyStage>=1)}
+function canBuild(b){return b.level<=s.level&&(s.storyStage>=STORY.length-1||s.storyStage>=4||b.name==='Starter Cottage'&&s.storyStage===0||b.name==='Little Park'&&s.storyStage>=2)}
+function storyModal(){let q=activeStory();document.getElementById('storyFace').textContent=q.face;document.getElementById('storyTitle').textContent=q.title;document.getElementById('storyText').textContent=q.speaker+': “'+q.dialogue+'”\n\nMission: '+q.objective;document.getElementById('storyButton').textContent=s.storyStage===0?'Start rebuilding':'Continue';document.getElementById('storyShade').classList.add('open');s.storySeen=true;save()}
+function closeStory(){document.getElementById('storyShade').classList.remove('open');if(s.storyStage===0){openPanel('build')}else if(s.storyStage===1){openCharacter('Riley')}else if(s.storyStage===2||s.storyStage===4||s.storyStage===5){openPanel('build')}else if(s.storyStage===3){openPanel('income')}}
+function storyComplete(type,target){let q=activeStory();if(q.type!==type||(q.target&&q.target!==target))return;s.xp+=q.reward;s.storyStage=Math.min(s.storyStage+1,STORY.length-1);s.storySeen=true;refresh();setTimeout(storyModal,250)}
+function newGame(){if(!confirm('Start a brand-new town? This deletes your saved town, buildings, XP, and tasks on this device.'))return;localStorage.removeItem('os_iso_save');location.reload()}
+
 s.placed.forEach(b=>{if(!b.lastCollected)b.lastCollected=Date.now();if(!b.rotation)b.rotation=0});if(!s.tasks||Array.isArray(s.tasks))s.tasks={};
 let cat='All',chosen=null,scale=1,ox=0,oy=30,drag=null,lastTap=0,moveMode=false,selectedBuilding=-1,rotateNext=false;
 function save(){localStorage.setItem('os_iso_save',JSON.stringify(s))}
@@ -155,26 +185,53 @@ function iso(x,y){return {x:(x-y)*TW/2,y:(x+y)*TH/2}}
 function project(x,y){let p=iso(x,y);return {x:canvas.clientWidth/2+p.x*scale+ox,y:canvas.clientHeight*.42+p.y*scale+oy}}
 function poly(points,fill,stroke='#719a65'){ctx.beginPath();points.forEach((p,i)=>i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y));ctx.closePath();ctx.fillStyle=fill;ctx.fill();ctx.strokeStyle=stroke;ctx.lineWidth=1;ctx.stroke()}
 function diamond(x,y,fill){let p=project(x,y);poly([{x:p.x,y:p.y},{x:p.x+TW/2*scale,y:p.y+TH/2*scale},{x:p.x,y:p.y+TH*scale},{x:p.x-TW/2*scale,y:p.y+TH/2*scale}],fill)}
+function buildingInk(points,fill,stroke='#42372f',line=2){poly(points,fill,stroke);ctx.lineWidth=line*scale}
+function windowAt(x,y,z=1){let a=scale*z;ctx.fillStyle='#a9e8f3';ctx.strokeStyle='#3d3531';ctx.lineWidth=2*a;ctx.fillRect(x-7*a,y-10*a,14*a,18*a);ctx.strokeRect(x-7*a,y-10*a,14*a,18*a);ctx.strokeStyle='#f7f8e5';ctx.lineWidth=1.5*a;ctx.beginPath();ctx.moveTo(x,y-9*a);ctx.lineTo(x,y+7*a);ctx.moveTo(x-6*a,y-1*a);ctx.lineTo(x+6*a,y-1*a);ctx.stroke();ctx.fillStyle='#f8f0c8';ctx.fillRect(x-9*a,y+8*a,18*a,3*a)}
+function shrubAt(x,y,r=7){let a=scale;ctx.fillStyle='#276c3b';ctx.strokeStyle='#274e32';ctx.lineWidth=2*a;ctx.beginPath();ctx.arc(x-r*a*.6,y, r*a*.8,0,7);ctx.arc(x+r*a*.5,y-3*a,r*a,0,7);ctx.fill();ctx.stroke();ctx.fillStyle='#70c95a';ctx.beginPath();ctx.arc(x+r*a*.25,y-5*a,r*a*.5,0,7);ctx.fill()}
 function drawBuilding(b){
  const bw=b.rotation%2?b.h:b.w,bh=b.rotation%2?b.w:b.h;
- const p=project(b.x+bw/2,b.y+bh/2),w=(bw+bh)*TW/4*scale,h=(bw+bh)*TH/4*scale,ht=42*scale;
- const left=b.color||'#efbd82',right=shade(left),roof=b.cat==='Shops'?'#a95b3f':b.cat==='Civic'?'#6c8fa8':'#9b6041';
- // soft cartoon shadow
- ctx.fillStyle='#314a2c55';ctx.beginPath();ctx.ellipse(p.x,p.y+ht+7*scale,w*.62,h*.54,0,0,Math.PI*2);ctx.fill();
- // side walls, with bold ink outlines
- poly([{x:p.x-w/2,y:p.y},{x:p.x,y:p.y+h/2},{x:p.x,y:p.y-ht+h/2},{x:p.x-w/2,y:p.y-ht}],left,'#493b31');
- poly([{x:p.x,y:p.y+h/2},{x:p.x+w/2,y:p.y},{x:p.x+w/2,y:p.y-ht},{x:p.x,y:p.y-ht+h/2}],right,'#493b31');
- // roof planes and eaves
- poly([{x:p.x-w/2-3*scale,y:p.y-ht},{x:p.x,y:p.y-ht-h*.55},{x:p.x+w/2+3*scale,y:p.y-ht},{x:p.x,y:p.y-ht+h*.5}],roof,'#49352c');
- ctx.strokeStyle='#e7b27d';ctx.lineWidth=2*scale;ctx.beginPath();ctx.moveTo(p.x-w/2,ySafe(p.y-ht));ctx.lineTo(p.x,ySafe(p.y-ht-h*.55));ctx.lineTo(p.x+w/2,ySafe(p.y-ht));ctx.stroke();
- // windows on front faces
- const win=(x,y)=>{ctx.fillStyle='#a9e5e8';ctx.strokeStyle='#493b31';ctx.lineWidth=2*scale;ctx.fillRect(x-6*scale,y-8*scale,12*scale,15*scale);ctx.strokeRect(x-6*scale,y-8*scale,12*scale,15*scale);ctx.beginPath();ctx.moveTo(x,y-8*scale);ctx.lineTo(x,y+7*scale);ctx.moveTo(x-6*scale,y);ctx.lineTo(x+6*scale,y);ctx.stroke()};
- win(p.x-w*.25,p.y-ht*.25);win(p.x+w*.23,p.y-ht*.22);
- // front door
- ctx.fillStyle='#8b5137';ctx.strokeStyle='#49352c';ctx.lineWidth=2*scale;ctx.fillRect(p.x-5*scale,p.y-ht*.18,11*scale,ht*.18);ctx.strokeRect(p.x-5*scale,p.y-ht*.18,11*scale,ht*.18);ctx.fillStyle='#f7d36a';ctx.beginPath();ctx.arc(p.x+2*scale,p.y-ht*.08,1.5*scale,0,Math.PI*2);ctx.fill();
- // chimney and roof highlight
- ctx.fillStyle='#b86b4c';ctx.fillRect(p.x+w*.22,p.y-ht-h*.55-13*scale,8*scale,17*scale);ctx.strokeStyle='#49352c';ctx.strokeRect(p.x+w*.22,p.y-ht-h*.55-13*scale,8*scale,17*scale);
- ctx.fillStyle='#fff';ctx.font=`900 ${Math.max(8,9*scale)}px system-ui`;ctx.textAlign='center';ctx.fillText(b.name.split(' ').slice(0,2).join(' '),p.x,p.y+ht*.24);
+ const p=project(b.x+bw/2,b.y+bh/2),a=scale;
+ const w=(bw+bh)*TW/4*a,h=(bw+bh)*TH/4*a,ht=(b.cat==='Civic'?55:b.cat==='Shops'?45:39)*a;
+ const ink='#43342c',left=b.color||'#f0c786',right=shade(left);
+ const park=b.cat==='Decor'||b.name==='Forest Camp';
+ ctx.save();ctx.lineJoin='round';ctx.lineCap='round';
+ ctx.fillStyle='#32582d55';ctx.beginPath();ctx.ellipse(p.x,p.y+12*a,w*.72,h*.8,0,0,7);ctx.fill();
+ if(park){
+  diamond(b.x,b.y,'#78c958');
+  if(b.name.includes('Fountain')){ctx.fillStyle='#b4dce6';ctx.strokeStyle=ink;ctx.lineWidth=2*a;ctx.beginPath();ctx.ellipse(p.x,p.y,22*a,10*a,0,0,7);ctx.fill();ctx.stroke();ctx.fillStyle='#4cb5d9';ctx.beginPath();ctx.ellipse(p.x,p.y-2*a,15*a,6*a,0,0,7);ctx.fill();ctx.strokeStyle='#d5f9ff';ctx.lineWidth=3*a;ctx.beginPath();ctx.moveTo(p.x,p.y-6*a);ctx.quadraticCurveTo(p.x-9*a,p.y-33*a,p.x,p.y-40*a);ctx.quadraticCurveTo(p.x+9*a,p.y-33*a,p.x,p.y-6*a);ctx.stroke()}
+  else if(b.name.includes('Garden')){for(let i=0;i<9;i++){let x=p.x+(i%3-1)*12*a,y=p.y+(Math.floor(i/3)-1)*7*a;shrubAt(x,y,4);ctx.fillStyle=['#ff7b9c','#ffe46e','#fff4ef'][i%3];ctx.beginPath();ctx.arc(x,y-6*a,3*a,0,7);ctx.fill()}}
+  else {ctx.fillStyle='#b58d59';ctx.fillRect(p.x-16*a,p.y-3*a,32*a,5*a);ctx.fillStyle='#f6d7a0';ctx.fillRect(p.x-14*a,p.y-5*a,28*a,3*a);for(let i=-1;i<=1;i+=2){let x=p.x+i*23*a;ctx.fillStyle='#775037';ctx.fillRect(x-3*a,p.y-24*a,6*a,29*a);shrubAt(x,p.y-32*a,17)}}
+  ctx.restore();return;
+ }
+ // Isometric building with outlined walls, detailed contrasting trim and roof eaves.
+ poly([{x:p.x-w/2,y:p.y},{x:p.x,y:p.y+h/2},{x:p.x,y:p.y-ht+h/2},{x:p.x-w/2,y:p.y-ht}],left,ink);
+ poly([{x:p.x,y:p.y+h/2},{x:p.x+w/2,y:p.y},{x:p.x+w/2,y:p.y-ht},{x:p.x,y:p.y-ht+h/2}],right,ink);
+ const commercial=b.cat==='Shops',civic=b.cat==='Civic';
+ const roof=commercial?'#b7544b':civic?'#557c9a':b.name.includes('Cottage')?'#c75d4a':'#a65b3d';
+ const roofLift=(commercial?7:16)*a;
+ poly([{x:p.x-w/2-5*a,y:p.y-ht-2*a},{x:p.x,y:p.y-ht-h*.55-roofLift},{x:p.x+w/2+5*a,y:p.y-ht-2*a},{x:p.x,y:p.y-ht+h*.5}],roof,ink);
+ // shingles and highlights
+ ctx.strokeStyle='#e6b18b';ctx.lineWidth=1.5*a;for(let k=1;k<=3;k++){ctx.beginPath();ctx.moveTo(p.x-w/2+(w*k/8),p.y-ht-2*a-h*.55*k/4);ctx.lineTo(p.x+(w*k/8),p.y-ht+h*.5-h*.55*k/4);ctx.stroke()}
+ // visible front windows with trim and curtains
+ windowAt(p.x-w*.27,p.y-ht*.35);windowAt(p.x+w*.26,p.y-ht*.35);
+ if(w>90*a){windowAt(p.x-w*.40,p.y-ht*.62,.7);windowAt(p.x+w*.39,p.y-ht*.62,.7)}
+ // door, step and knob
+ ctx.fillStyle=commercial?'#416f85':'#91553d';ctx.strokeStyle=ink;ctx.lineWidth=2*a;ctx.fillRect(p.x-7*a,p.y-ht*.17,14*a,ht*.35);ctx.strokeRect(p.x-7*a,p.y-ht*.17,14*a,ht*.35);ctx.fillStyle='#ffdd72';ctx.beginPath();ctx.arc(p.x+4*a,p.y-ht*.03,1.7*a,0,7);ctx.fill();ctx.fillStyle='#d7c3a3';ctx.fillRect(p.x-10*a,p.y+ht*.17,20*a,3*a);
+ if(commercial){
+  // colorful striped storefront awning, projecting above door and shop windows
+  const awY=p.y-ht*.46;ctx.fillStyle='#fff4d8';ctx.strokeStyle=ink;ctx.lineWidth=1.5*a;ctx.fillRect(p.x-w*.35,awY,w*.70,10*a);ctx.strokeRect(p.x-w*.35,awY,w*.70,10*a);for(let k=0;k<6;k++){ctx.fillStyle=k%2?'#fff4d8':'#df6a57';ctx.fillRect(p.x-w*.35+k*w*.70/6,awY, w*.70/6,10*a)}
+  ctx.fillStyle='#f9e9b2';ctx.strokeStyle=ink;ctx.fillRect(p.x-24*a,p.y-ht-18*a,48*a,14*a);ctx.strokeRect(p.x-24*a,p.y-ht-18*a,48*a);ctx.fillStyle='#684431';ctx.textAlign='center';ctx.font=`bold ${Math.max(6,8*a)}px system-ui`;ctx.fillText(b.name.split(' ').slice(0,2).join(' '),p.x,p.y-ht-8*a);
+ }else if(civic){
+  // town hall / school style clock and entrance columns
+  ctx.fillStyle='#f4e4bd';ctx.strokeStyle=ink;ctx.lineWidth=2*a;ctx.beginPath();ctx.arc(p.x,p.y-ht-h*.25,8*a,0,7);ctx.fill();ctx.stroke();ctx.beginPath();ctx.moveTo(p.x,p.y-ht-h*.25);ctx.lineTo(p.x+3*a,p.y-ht-h*.25-3*a);ctx.stroke();
+  for(let k of [-1,1]){ctx.fillStyle='#f7e9c9';ctx.fillRect(p.x+k*14*a-2*a,p.y-ht*.18,4*a,ht*.4);ctx.strokeRect(p.x+k*14*a-2*a,p.y-ht*.18,4*a,ht*.4)}
+ }else{
+  // chimney, flowerbox, porch and a small rounded shrub by the front wall
+  ctx.fillStyle='#ba6a50';ctx.strokeStyle=ink;ctx.lineWidth=2*a;ctx.fillRect(p.x+w*.20,p.y-ht-h*.55-10*a,10*a,22*a);ctx.strokeRect(p.x+w*.20,p.y-ht-h*.55-10*a,10*a,22*a);
+  ctx.fillStyle='#8d583b';ctx.fillRect(p.x-w*.27-9*a,p.y-ht*.35+10*a,18*a,5*a);for(let j=-1;j<=1;j++){ctx.fillStyle=['#fa7fa4','#f5e77b','#e1a0e8'][j+1];ctx.beginPath();ctx.arc(p.x-w*.27+j*5*a,p.y-ht*.35+9*a,3*a,0,7);ctx.fill()}
+  shrubAt(p.x+w*.57,p.y+7*a,7);
+ }
+ ctx.restore();
 }
 function ySafe(v){return v}
 function shade(hex){const m=/^#([0-9a-f]{6})$/i.exec(hex||'');if(!m)return '#c88e6c';let n=parseInt(m[1],16),r=Math.max(0,((n>>16)&255)-38),g=Math.max(0,((n>>8)&255)-38),b=Math.max(0,(n&255)-38);return '#'+[r,g,b].map(v=>v.toString(16).padStart(2,'0')).join('')}
@@ -205,7 +262,7 @@ function drawBackground(){if(backgroundCanvas)return backgroundCanvas;
 }
 
 function drawResident(c,x,y,index){
- const p=project(x,y),z=scale,skin='#f4cf45',outline='#3d3028';
+ const p=project(x,y),z=scale*1.42,skin='#f4cf45',outline='#3d3028';
  const shirts=['#f4f0e5','#e36e9d','#477d55','#9873b8'];
  ctx.save();ctx.lineCap='round';ctx.lineJoin='round';ctx.lineWidth=2*z;ctx.strokeStyle=outline;
  // feet and legs
@@ -234,7 +291,25 @@ function drawResident(c,x,y,index){
 
 function draw(){let W=canvas.clientWidth,H=canvas.clientHeight;if(!W||!H)return;ctx.fillStyle='#83c95d';ctx.fillRect(0,0,W,H);ctx.drawImage(drawBackground(),W/2+ox-BG_X*scale,H*.42+oy-BG_Y*scale,BG_W*scale,BG_H*scale);
  s.placed.slice().sort((a,b)=>(a.x+a.y)-(b.x+b.y)).forEach(drawBuilding);
- chars.filter(c=>c.level<=s.level).forEach((c,i)=>{let p=project(4+i*2,7+(i%2)),z=scale;ctx.fillStyle='#f1c83e';ctx.strokeStyle='#49352c';ctx.lineWidth=1.6*z;ctx.beginPath();ctx.arc(p.x,p.y-17*z,7*z,0,Math.PI*2);ctx.fill();ctx.stroke();ctx.fillStyle=['#e9f0f1','#c96b9b','#477b55','#9a6db2'][i%4];ctx.beginPath();ctx.moveTo(p.x-7*z,p.y-9*z);ctx.lineTo(p.x+7*z,p.y-9*z);ctx.lineTo(p.x+8*z,p.y+5*z);ctx.lineTo(p.x-8*z,p.y+5*z);ctx.closePath();ctx.fill();ctx.stroke();ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(p.x-2*z,p.y-19*z,2.2*z,0,Math.PI*2);ctx.arc(p.x+3*z,p.y-19*z,2.2*z,0,Math.PI*2);ctx.fill();ctx.fillStyle='#302a24';ctx.beginPath();ctx.arc(p.x-1.5*z,p.y-19*z,1*z,0,Math.PI*2);ctx.arc(p.x+3.5*z,p.y-19*z,1*z,0,Math.PI*2);ctx.fill();});
+ // Original hand-drawn cartoon residents, rendered at readable size in the actual town.
+ const now=Date.now();
+ chars.filter(c=>isCharacterUnlocked(c)).forEach((c,i)=>{
+  const busy=!!s.tasks[c.name]&&s.tasks[c.name].endsAt>now;
+  const t=now/1000+i*2.3;
+  const homeX=3.4+i*2.1,homeY=5.2+(i%2)*2.1;
+  const wander=busy?0:1;
+  const x=homeX+Math.sin(t*.55)*.42*wander;
+  const y=homeY+Math.cos(t*.55)*.27*wander;
+  const foot=project(x,y),z=scale;
+  ctx.fillStyle='#31552b55';ctx.beginPath();ctx.ellipse(foot.x,foot.y+5*z,13*z,5*z,0,0,Math.PI*2);ctx.fill();
+  drawResident(c,x,y,chars.indexOf(c));
+  if(s.tasks[c.name]&&now>=s.tasks[c.name].endsAt){
+   ctx.font=`bold ${Math.max(15,20*z)}px system-ui`;ctx.textAlign='center';ctx.fillText('✔️',foot.x,foot.y-78*z);
+  }
+  ctx.font=`bold ${Math.max(9,11*z)}px system-ui`;
+  ctx.textAlign='center';ctx.lineWidth=3*z;ctx.strokeStyle='#26341c';ctx.strokeText(c.name,foot.x,foot.y+22*z);
+  ctx.fillStyle='#fffbe6';ctx.fillText(c.name,foot.x,foot.y+22*z);
+ });
  if(chosen){let p=project(chosen.x,chosen.y);ctx.strokeStyle='#ffe16b';ctx.lineWidth=3;ctx.beginPath();ctx.ellipse(p.x,p.y,TW*.55*scale,TH*.55*scale,0,0,Math.PI*2);ctx.stroke()}
 }
 function hitTile(px,py){let best=null,dist=1e9;for(let y=0;y<18;y++)for(let x=0;x<22;x++){let p=project(x+.5,y+.5),d=Math.hypot((px-p.x)/scale,(py-p.y)/scale);if(d<dist){dist=d;best={x,y}}}return dist<Math.max(24,Math.min(42,TH*1.15*scale))?best:null}
@@ -285,18 +360,18 @@ canvas.addEventListener('lostpointercapture',e=>finishPointer(e,true));
 canvas.addEventListener('contextmenu',e=>e.preventDefault());
 canvas.addEventListener('wheel',e=>{e.preventDefault();zoomAt(scale*Math.exp(-e.deltaY*.001),e.clientX,e.clientY)},{passive:false});
 function occupied(x,y,w,h,ignore=-1){return s.placed.some((p,i)=>{if(i===ignore)return false;let pw=p.rotation%2?p.h:p.w,ph=p.rotation%2?p.w:p.h;return x<p.x+pw&&x+w>p.x&&y<p.y+ph&&y+h>p.y})}
-function placePending(t){let b=window.pendingBuild,bw=rotateNext?b.h:b.w,bh=rotateNext?b.w:b.h;if(occupied(t.x,t.y,bw,bh)){alert('That space is occupied. Choose another spot.');return}s.placed.push({...b,x:t.x,y:t.y,rotation:rotateNext?1:0,lastCollected:Date.now()});rotateNext=false;s.xp+=25;s.quests=Math.min(3,s.quests+1);save();refresh();draw()}
-function buildMenu(){let cats=['All',...new Set(items.map(i=>i.cat))];let tabs=cats.map(c=>`<button class="${c===cat?'active':''}" onclick="cat='${c}';buildMenu()">${c}</button>`).join('');let arr=items.filter(i=>cat==='All'||i.cat===cat);let cards=arr.map(b=>`<div class="card ${b.level>s.level?'locked':''}"><div class="emoji">${b.emoji}</div><div><b>${b.name}</b><small>${b.level>s.level?'Unlocks at level '+b.level:'Free · Level '+b.level}</small></div><button ${b.level>s.level?'disabled':''} onclick="selectBuild('${b.name}')">${b.level>s.level?'Locked':'Place'}</button></div>`).join('');document.querySelectorAll('#tabs').forEach(el=>el.innerHTML=tabs);document.querySelectorAll('#catalog').forEach(el=>el.innerHTML=cards)}
-function selectBuild(name){let b=items.find(x=>x.name===name);window.pendingBuild=b;alert('Tap an open spot on the town map to place '+name+'.')}
-function refresh(){document.getElementById('level').textContent='LEVEL '+s.level;while(s.xp>=s.level*100){s.xp-=s.level*100;s.level++}document.getElementById('xptext').textContent=s.xp+' / '+(s.level*100)+' XP';document.getElementById('xpbar').style.width=Math.min(100,s.xp/(s.level*100)*100)+'%';document.getElementById('hudLevel').textContent='LEVEL '+s.level;document.getElementById('hudXpText').textContent=s.xp+' / '+(s.level*100)+' XP';document.getElementById('hudXpBar').style.width=Math.min(100,s.xp/(s.level*100)*100)+'%';document.getElementById('taskBadge').textContent=Math.max(1,3-(s.quests||0));document.getElementById('townName').textContent=s.town;document.getElementById('questCount').textContent=s.quests+' / 3';document.getElementById('quest').textContent=s.quests>=3?'First neighborhood started! Keep placing buildings and unlock new content as you level up.':'Place '+(3-s.quests)+' more building(s) to complete your first town-building task.';renderResidents();renderIncome();buildMenu();renderCharacterRail();save()}
+function placePending(t){let b=window.pendingBuild,bw=rotateNext?b.h:b.w,bh=rotateNext?b.w:b.h;if(occupied(t.x,t.y,bw,bh)){alert('That space is occupied. Choose another spot.');return}s.placed.push({...b,x:t.x,y:t.y,rotation:rotateNext?1:0,lastCollected:Date.now()});rotateNext=false;s.xp+=25;s.quests=Math.min(3,s.quests+1);save();storyComplete('build',b.name);refresh();draw()}
+function buildMenu(){let cats=['All',...new Set(items.map(i=>i.cat))];let tabs=cats.map(c=>`<button class="${c===cat?'active':''}" onclick="cat='${c}';buildMenu()">${c}</button>`).join('');let arr=items.filter(i=>cat==='All'||i.cat===cat);let cards=arr.map(b=>`<div class="card ${!canBuild(b)?'locked':''}"><div class="emoji">${b.emoji}</div><div><b>${b.name}</b><small>${!canBuild(b)?(b.level>s.level?'Unlocks at level '+b.level:'Unlock through story'):'Free · Level '+b.level}</small></div><button ${!canBuild(b)?'disabled':''} onclick="selectBuild('${b.name}')">${!canBuild(b)?'Locked':'Place'}</button></div>`).join('');document.querySelectorAll('#tabs').forEach(el=>el.innerHTML=tabs);document.querySelectorAll('#catalog').forEach(el=>el.innerHTML=cards)}
+function selectBuild(name){let b=items.find(x=>x.name===name);if(!b||!canBuild(b)){alert('Keep following the story to unlock this building.');return}window.pendingBuild=b;closePanel();alert('Tap an open spot on the town map to place '+name+'.')}
+function refresh(){document.getElementById('level').textContent='LEVEL '+s.level;while(s.xp>=s.level*100){s.xp-=s.level*100;s.level++}document.getElementById('xptext').textContent=s.xp+' / '+(s.level*100)+' XP';document.getElementById('xpbar').style.width=Math.min(100,s.xp/(s.level*100)*100)+'%';document.getElementById('hudLevel').textContent='LEVEL '+s.level;document.getElementById('hudXpText').textContent=s.xp+' / '+(s.level*100)+' XP';document.getElementById('hudXpBar').style.width=Math.min(100,s.xp/(s.level*100)*100)+'%';document.getElementById('taskBadge').textContent='!';document.getElementById('townName').textContent=s.town;document.getElementById('questCount').textContent='Chapter '+(s.storyStage+1);document.getElementById('quest').textContent=activeStory().objective;renderResidents();renderIncome();buildMenu();renderCharacterRail();save()}
 
 const taskChoices=[{label:'1 minute',ms:60000,xp:5},{label:'1 hour',ms:3600000,xp:15},{label:'4 hours',ms:14400000,xp:35},{label:'8 hours',ms:28800000,xp:60},{label:'24 hours',ms:86400000,xp:120}];
 function fmt(ms){if(ms<=0)return 'Ready to collect';let m=Math.ceil(ms/60000);if(m<60)return m+'m remaining';let h=Math.floor(m/60),r=m%60;return h+'h '+(r?r+'m':'')+' remaining'}
-function renderResidents(){document.getElementById('residents').innerHTML=chars.map((c,i)=>{let t=s.tasks[c.name],locked=c.level>s.level,remaining=t?t.endsAt-Date.now():0;let status=t?(remaining>0?fmt(remaining):'Task complete · collect XP'):'Choose a task';return `<div class="task"><div style="flex:1"><b>${c.emoji} ${c.name}</b><div class="subtle">${locked?'Unlocks at level '+c.level:status}</div>${t&&remaining>0?`<div class="progress"><i style="width:${Math.max(2,Math.min(100,(1-remaining/t.duration)*100))}%"></i></div>`:''}</div>${locked?'<b>🔒</b>':t?(remaining>0?'<b>⏳</b>':`<button onclick="collectTask('${c.name}')">Collect</button>`):`<button onclick="startTask('${c.name}',0)">1m</button>`}</div>${!locked&&!t?`<div class="mini-actions">${taskChoices.slice(1).map((q,j)=>`<button onclick="startTask('${c.name}',${j+1})">${q.label}</button>`).join('')}</div>`:''}`}).join('')}
-function startTask(name,index){let q=taskChoices[index];s.tasks[name]={startedAt:Date.now(),endsAt:Date.now()+q.ms,duration:q.ms,xp:q.xp};save();refresh()}
-function collectTask(name){let t=s.tasks[name];if(!t||Date.now()<t.endsAt)return;s.xp+=t.xp;delete s.tasks[name];refresh();draw()}
+function renderResidents(){document.getElementById('residents').innerHTML=chars.map((c,i)=>{let t=s.tasks[c.name],locked=!isCharacterUnlocked(c),remaining=t?t.endsAt-Date.now():0;let status=t?(remaining>0?fmt(remaining):'Task complete · collect XP'):'Choose a task';return `<div class="task"><div style="flex:1"><b>${c.emoji} ${c.name}</b><div class="subtle">${locked?'Unlocks at level '+c.level:status}</div>${t&&remaining>0?`<div class="progress"><i style="width:${Math.max(2,Math.min(100,(1-remaining/t.duration)*100))}%"></i></div>`:''}</div>${locked?'<b>🔒</b>':t?(remaining>0?'<b>⏳</b>':`<button onclick="collectTask('${c.name}')">Collect</button>`):`<button onclick="startTask('${c.name}',0)">1m</button>`}</div>${!locked&&!t?`<div class="mini-actions">${taskChoices.slice(1).map((q,j)=>`<button onclick="startTask('${c.name}',${j+1})">${q.label}</button>`).join('')}</div>`:''}`}).join('')}
+function startTask(name,index){let c=chars.find(c=>c.name===name);if(!c||!isCharacterUnlocked(c))return;let q=taskChoices[index];s.tasks[name]={startedAt:Date.now(),endsAt:Date.now()+q.ms,duration:q.ms,xp:q.xp};save();refresh()}
+function collectTask(name){let t=s.tasks[name];if(!t||Date.now()<t.endsAt)return;s.xp+=t.xp;delete s.tasks[name];storyComplete('task',name);refresh();draw()}
 function renderIncome(){let now=Date.now();document.getElementById('income').innerHTML=s.placed.length?s.placed.map((b,i)=>{let elapsed=now-(b.lastCollected||now),ready=Math.floor(elapsed/(b.interval||60000)),amount=ready*(b.income||10);return `<div class="task"><div style="flex:1"><b>${b.emoji} ${b.name}</b><div class="subtle">${amount>0?'$'+amount+' ready to collect':'Next payout in '+fmt((b.interval||60000)-(elapsed%(b.interval||60000)))}</div></div><button onclick="collectIncome(${i})" ${amount<=0?'disabled style="opacity:.45"':''}>Collect</button></div>`}).join(''):'<p class="notice">Place buildings to start earning town income.</p>'}
-function collectIncome(i){let b=s.placed[i];if(!b)return;let now=Date.now(),n=Math.floor((now-(b.lastCollected||now))/(b.interval||60000));if(n<1)return;let earned=n*(b.income||10);b.lastCollected=(b.lastCollected||now)+n*(b.interval||60000);s.xp+=Math.max(1,Math.floor(earned/10));save();refresh();draw();alert('Collected $'+earned+' and earned XP!')}
+function collectIncome(i){let b=s.placed[i];if(!b)return;let now=Date.now(),n=Math.floor((now-(b.lastCollected||now))/(b.interval||60000));if(n<1)return;let earned=n*(b.income||10);b.lastCollected=(b.lastCollected||now)+n*(b.interval||60000);s.xp+=Math.max(1,Math.floor(earned/10));save();storyComplete('income');refresh();draw();alert('Collected $'+earned+' and earned XP!')}
 function rotateSelected(){if(selectedBuilding>=0){s.placed[selectedBuilding].rotation=(s.placed[selectedBuilding].rotation+1)%2;save();draw();refresh()}else if(window.pendingBuild){rotateNext=!rotateNext;alert('Next building placement: '+(rotateNext?'rotated':'normal orientation'))}else alert('Select a placed building or choose one from Build first.')}
 function beginMove(){if(selectedBuilding<0){alert('Tap a building on the map first, then choose Move.');return}moveMode=true;alert('Tap an open tile to move the selected building.')}
 
@@ -305,9 +380,9 @@ function closePanel(){document.getElementById('menuShade').classList.remove('ope
 function buildMenuIn(root){let oldTabs=root.querySelector('#tabs'),oldCatalog=root.querySelector('#catalog');if(oldTabs)oldTabs.id='tabs';if(oldCatalog)oldCatalog.id='catalog';buildMenu()}
 function renderResidentsIn(root){let target=root.querySelector('#residents');if(target)target.innerHTML=document.getElementById('residents').innerHTML}
 function renderIncomeIn(root){let target=root.querySelector('#income');if(target)target.innerHTML=document.getElementById('income').innerHTML}
-function renderCharacterRail(){let rail=document.getElementById('characterRail');if(!rail)return;rail.innerHTML=chars.filter(c=>c.level<=s.level).map(c=>{let t=s.tasks[c.name],ready=t&&Date.now()>=t.endsAt;return `<button class="${t?(ready?'ready':'busy'):''}" title="${c.name}" onclick="openCharacter('${c.name}')">${c.emoji}</button>`}).join('')}
+function renderCharacterRail(){let rail=document.getElementById('characterRail');if(!rail)return;rail.innerHTML=chars.filter(c=>isCharacterUnlocked(c)).map(c=>{let t=s.tasks[c.name],ready=t&&Date.now()>=t.endsAt;return `<button class="${t?(ready?'ready':'busy'):''}" title="${c.name}" onclick="openCharacter('${c.name}')">${c.emoji}</button>`}).join('')}
 function openCharacter(name){openPanel('residents');setTimeout(()=>{let nodes=[...document.querySelectorAll('#sheetContent .task')];let n=nodes.find(x=>x.textContent.includes(name));if(n)n.scrollIntoView({block:'center',behavior:'smooth'})},60)}
-function openTaskBook(){let shade=document.getElementById('taskShade');let done=Math.min(3,s.quests||0),left=Math.max(0,3-done);let rows=[{title:'A place to call home',desc:'Place 3 buildings in your town.',progress:done,total:3,reward:'25 XP'},{title:'Meet the neighbors',desc:'Unlock residents as your town grows.',progress:chars.filter(c=>c.level<=s.level).length,total:chars.length,reward:'Character unlocks'},{title:'Build your neighborhood',desc:'Keep expanding and add new buildings.',progress:s.placed.length,total:Math.max(5,s.level*2),reward:'XP and new content'}];document.getElementById('taskBookContent').innerHTML=rows.map(q=>`<div class="quest-row"><b>${q.title}</b>${q.desc}<div class="quest-progress"><i style="width:${Math.min(100,q.progress/q.total*100)}%"></i></div><small>${q.progress} / ${q.total} · Reward: ${q.reward}</small></div>`).join('')+'<p class="notice">Story quests and character-specific missions will appear here as they unlock.</p>';shade.classList.add('open')}
+function openTaskBook(){let q=activeStory();let done=s.storyStage;let rows=`<div class="quest-row"><b>⭐ ${q.title}</b><p>${q.objective}</p><small>Story chapter ${Math.min(done+1,STORY.length)} of ${STORY.length} · Reward: ${q.reward} XP</small><div style="margin-top:8px"><button class="story-action" onclick="closeTaskBook();storyModal()">Story dialogue</button></div></div>`+STORY.slice(0,done).map(a=>`<div class="quest-row"><b>✓ ${a.title}</b><small>Completed · ${a.reward} XP earned</small></div>`).join('');document.getElementById('taskBookContent').innerHTML=rows;document.getElementById('taskShade').classList.add('open')}
 function closeTaskBook(){document.getElementById('taskShade').classList.remove('open')}
-function init(){resize();refresh();draw();setInterval(()=>{renderCharacterRail();renderResidents();renderIncome();if(document.getElementById('menuShade').classList.contains('open')){let title=document.getElementById('sheetTitle').textContent;if(title.includes('Residents'))renderResidentsIn(document.getElementById('sheetContent'));if(title.includes('income'))renderIncomeIn(document.getElementById('sheetContent'))}},5000)}window.addEventListener('resize',resize);init();
+function init(){resize();refresh();draw();setInterval(()=>{if(document.visibilityState==='visible')requestDraw();},400);setInterval(()=>{renderCharacterRail();renderResidents();renderIncome();if(document.getElementById('menuShade').classList.contains('open')){let title=document.getElementById('sheetTitle').textContent;if(title.includes('Residents'))renderResidentsIn(document.getElementById('sheetContent'));if(title.includes('income'))renderIncomeIn(document.getElementById('sheetContent'))}},5000)}window.addEventListener('resize',resize);init();if(!s.storySeen)setTimeout(storyModal,550);
 </script></body></html>

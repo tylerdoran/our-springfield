@@ -1,8 +1,7 @@
-# Our Springfield v1.0
+Our Springfield v1.5 — forced automatic fresh start
 
-This update fixes touch navigation. Dragging on the town map pans the camera smoothly; a short tap selects a building or places one selected building exactly once. Touch movement no longer triggers placement, and stale selection previews are cleared when tapping empty ground. The existing save data and game features are retained.
+This update automatically deletes the old local town once, even if the v1.3 reset flag was already set. All old buildings, XP, tasks and story progress are erased. The player starts at Level 1 with the first introductory story. The v1.5 reset flag prevents repeat resets on subsequent launches. Unlimited money and donuts remain.
 
-## Update
-Upload all files in this folder to the existing GitHub Pages repository, replacing the previous versions. Keep the same repository and Pages URL. Wait for the deployment to finish, then fully close and reopen the game on the iPhone.
+Upload index.html to the same GitHub Pages repository, replacing the previous version. Wait for Pages deployment to finish. Open the GitHub Pages site in Safari and reload it, then launch the Home Screen app. If you see an older game, Safari may be using a cached version; reload the GitHub Pages site first.
 
-All artwork and characters remain original genre-inspired creations.
+WARNING: the reset is irreversible without a backup.
