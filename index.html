@@ -229,14 +229,38 @@ function draw(){let W=canvas.clientWidth,H=canvas.clientHeight;if(!W||!H)return;
  if(chosen){let p=project(chosen.x,chosen.y);ctx.strokeStyle='#ffe16b';ctx.lineWidth=3;ctx.beginPath();ctx.ellipse(p.x,p.y,TW*.55*scale,TH*.55*scale,0,0,Math.PI*2);ctx.stroke()}
 }
 function hitTile(px,py){let best=null,dist=1e9;for(let y=0;y<18;y++)for(let x=0;x<22;x++){let p=project(x+.5,y+.5),d=Math.hypot((px-p.x)/scale,(py-p.y)/scale);if(d<dist){dist=d;best={x,y}}}return dist<Math.max(24,Math.min(42,TH*1.15*scale))?best:null}
-let startPt=null;
-canvas.addEventListener('pointerdown',e=>{canvas.setPointerCapture(e.pointerId);startPt={x:e.clientX,y:e.clientY,ox,oy};drag=true});
-canvas.addEventListener('pointerup',e=>{if(!drag)return;drag=false;let dx=e.clientX-startPt.x,dy=e.clientY-startPt.y;if(Math.hypot(dx,dy)>7){ox+=dx;oy+=dy;backgroundKey='';draw();return}let r=canvas.getBoundingClientRect(),px=e.clientX-r.left,py=e.clientY-r.top;
- if(moveMode&&selectedBuilding>=0){let t=hitTile(px,py);if(t){let b=s.placed[selectedBuilding],bw=b.rotation%2?b.h:b.w,bh=b.rotation%2?b.w:b.h;if(!occupied(t.x,t.y,bw,bh,selectedBuilding)){b.x=t.x;b.y=t.y;save();moveMode=false;selectedBuilding=-1;refresh();draw()}else alert('That space is occupied.')}return}
+let startPt=null,activePointer=null,isPanning=false,lastPointer=null;
+// One-finger map navigation: a swipe pans; only a stationary tap selects or places.
+canvas.addEventListener('pointerdown',e=>{
+ if(activePointer!==null)return;
+ e.preventDefault();activePointer=e.pointerId;canvas.setPointerCapture(e.pointerId);
+ startPt={x:e.clientX,y:e.clientY};lastPointer={x:e.clientX,y:e.clientY};isPanning=false;drag=true;
+});
+canvas.addEventListener('pointermove',e=>{
+ if(!drag||e.pointerId!==activePointer||!lastPointer)return;
+ const total=Math.hypot(e.clientX-startPt.x,e.clientY-startPt.y);
+ if(total>5)isPanning=true;
+ if(isPanning){ox+=e.clientX-lastPointer.x;oy+=e.clientY-lastPointer.y;backgroundKey='';draw();}
+ lastPointer={x:e.clientX,y:e.clientY};
+});
+function finishPointer(e,cancelled=false){
+ if(!drag||e.pointerId!==activePointer)return;
+ const wasPan=isPanning;drag=false;activePointer=null;lastPointer=null;isPanning=false;
+ if(cancelled){startPt=null;return;}
+ if(wasPan){startPt=null;return;}
+ const r=canvas.getBoundingClientRect(),px=e.clientX-r.left,py=e.clientY-r.top;
+ if(moveMode&&selectedBuilding>=0){let t=hitTile(px,py);if(t){let b=s.placed[selectedBuilding],bw=b.rotation%2?b.h:b.w,bh=b.rotation%2?b.w:b.h;if(!occupied(t.x,t.y,bw,bh,selectedBuilding)){b.x=t.x;b.y=t.y;save();moveMode=false;selectedBuilding=-1;chosen=null;refresh();draw()}else alert('That space is occupied.')}startPt=null;return;}
  let hit=-1;for(let i=s.placed.length-1;i>=0;i--){let b=s.placed[i],bw=b.rotation%2?b.h:b.w,bh=b.rotation%2?b.w:b.h,p=project(b.x+bw/2,b.y+bh/2);if(Math.hypot(px-p.x,py-(p.y-12*scale))<34*scale){hit=i;break}}
- if(hit>=0){selectedBuilding=hit;chosen={x:s.placed[hit].x,y:s.placed[hit].y};draw();return}
- let t=hitTile(px,py);if(!t)return;chosen=t;if(window.pendingBuild){placePending(t);window.pendingBuild=null}draw()});
-canvas.addEventListener('pointercancel',()=>{drag=false;startPt=null});
+ if(hit>=0){selectedBuilding=hit;chosen={x:s.placed[hit].x,y:s.placed[hit].y};draw();startPt=null;return;}
+ let t=hitTile(px,py);if(!t){chosen=null;draw();startPt=null;return;}
+ if(window.pendingBuild){const pending=window.pendingBuild;window.pendingBuild=null;placePending(t);}
+ else {chosen=null;selectedBuilding=-1;}
+ draw();startPt=null;
+}
+canvas.addEventListener('pointerup',e=>finishPointer(e));
+canvas.addEventListener('pointercancel',e=>finishPointer(e,true));
+canvas.addEventListener('lostpointercapture',e=>{if(e.pointerId===activePointer)finishPointer(e,true)});
+canvas.addEventListener('contextmenu',e=>e.preventDefault());
 canvas.addEventListener('wheel',e=>{e.preventDefault();scale=Math.max(.65,Math.min(1.8,scale+(e.deltaY<0?.08:-.08)));backgroundKey='';draw()},{passive:false});
 function occupied(x,y,w,h,ignore=-1){return s.placed.some((p,i)=>{if(i===ignore)return false;let pw=p.rotation%2?p.h:p.w,ph=p.rotation%2?p.w:p.h;return x<p.x+pw&&x+w>p.x&&y<p.y+ph&&y+h>p.y})}
 function placePending(t){let b=window.pendingBuild,bw=rotateNext?b.h:b.w,bh=rotateNext?b.w:b.h;if(occupied(t.x,t.y,bw,bh)){alert('That space is occupied. Choose another spot.');return}s.placed.push({...b,x:t.x,y:t.y,rotation:rotateNext?1:0,lastCollected:Date.now()});rotateNext=false;s.xp+=25;s.quests=Math.min(3,s.quests+1);save();refresh();draw()}
