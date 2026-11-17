@@ -1,3 +1,1 @@
-Our Springfield v2.1 — Construction update
-
-New buildings except Starter Cottage have timed construction. Tap them to see remaining time, complete construction when ready, or finish instantly with unlimited donuts. Construction continues while the game is closed. Existing placed buildings remain completed. Upload index.html to the root of your GitHub Pages repository.
+Our Springfield v2.2: roads, sidewalks and dirt path painting. Open Roads at top right, select a brush and tap owned land. Tap Done editing to return to normal play. Existing save is preserved. Replace index.html in GitHub Pages.

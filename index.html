@@ -116,7 +116,7 @@ nav{position:fixed;bottom:0;left:0;right:0;background:#fff9f1;border-top:1px sol
 <main>
 <div class="status"><div><span class="level" id="level">LEVEL 1</span><span class="xp"><i id="xpbar"></i></span> <small id="xptext">0 / 100 XP</small></div><strong id="townName">Your Town</strong></div>
 <div class="layout"><div class="town-area">
-<div class="scene"><canvas id="town"></canvas><div class="hint">Drag to move · Pinch to zoom · Tap a resident to give them a task</div><div class="quest-float"><b>📜 Current task</b><small id="questCount">0 / 3</small><div id="quest" class="notice">Welcome! Place your first home to begin building your town.</div></div><div class="build-controls"><button onclick="beginMove()">↔ Move</button><button onclick="rotateSelected()">⟳ Rotate</button></div></div>
+<div class="scene"><canvas id="town"></canvas><div class="hint">Drag to move · Pinch to zoom · Tap a resident to give them a task</div><div class="quest-float"><b>📜 Current task</b><small id="questCount">0 / 3</small><div id="quest" class="notice">Welcome! Place your first home to begin building your town.</div></div><div class="build-controls"><button onclick="beginMove()">↔ Move</button><button onclick="rotateSelected()">⟳ Rotate</button><button onclick="openRoadMenu()">🛣️ Roads</button></div></div>
 </div><div class="right" id="gamePanels">
 <section class="panel"><h3>🏗️ Build menu</h3><div class="toolbar" id="tabs"></div><div class="cards" id="catalog"></div></section>
 <section class="panel"><h3>🧍 Residents & tasks</h3><div id="residents"></div></section><section class="panel"><h3>💰 Building income</h3><div id="income"></div></section>
@@ -305,6 +305,8 @@ function newGame(){if(!confirm('Start a brand-new town? This deletes your saved 
 
 s.placed.forEach(b=>{if(!b.lastCollected)b.lastCollected=Date.now();if(!b.rotation)b.rotation=0});if(!s.tasks||Array.isArray(s.tasks))s.tasks={};
 const LAND_GRID=36, PLOT=4, PLOTS_PER_SIDE=LAND_GRID/PLOT;
+if(!s.paths || typeof s.paths!=='object' || Array.isArray(s.paths))s.paths={};
+let pathBrush=null;
 if(!Array.isArray(s.landPlots)){s.landPlots=[];for(let py=3;py<6;py++)for(let px=3;px<6;px++)s.landPlots.push(px+','+py);}
 function plotId(px,py){return Math.floor(px/PLOT)+','+Math.floor(py/PLOT)}
 function landOwned(x,y){return x>=0&&y>=0&&x<LAND_GRID&&y<LAND_GRID&&s.landPlots.includes(plotId(x,y))}
@@ -316,6 +318,40 @@ function purchasablePlots(){let out=[];for(let y=0;y<PLOTS_PER_SIDE;y++)for(let 
 function buyLand(id,method){let p=purchasablePlots().find(q=>q.id===id);if(!p)return alert('Unlock a neighboring plot first.');if(!confirm('Expand into this 4 × 4 plot for '+(method==='donuts'?p.donuts+' donuts':'$'+p.cash.toLocaleString())+'? Your balance is unlimited.'))return;s.landPlots.push(id);s.xp+=30;storyComplete('land');save();refresh();requestDraw();openLandMenu()}
 function openLandMenu(){const shade=document.getElementById('menuShade'),content=document.getElementById('sheetContent');document.getElementById('sheetTitle').textContent='🗺️ Land Expansion';const plots=purchasablePlots();content.innerHTML='<p class="notice">Your town starts with 9 plots. Expand one adjacent 4 × 4 plot at a time. Cash and donuts are unlimited, but new land must still be purchased in order. '+s.landPlots.length+' of '+(PLOTS_PER_SIDE*PLOTS_PER_SIDE)+' plots owned.</p>'+ (plots.length?plots.map(p=>'<div class="task"><div><b>Plot '+(p.x+1)+'-'+(p.y+1)+'</b><div class="subtle">16 new tiles · $'+p.cash.toLocaleString()+' or '+p.donuts+' donuts</div></div><div class="mini-actions"><button onclick="buyLand(\''+p.id+'\',\'cash\')">💵 Buy</button><button onclick="buyLand(\''+p.id+'\',\'donuts\')">🍩 Buy</button></div></div>').join(''):'<p>All land plots unlocked!</p>');shade.classList.add('open')}
 let cat='All',chosen=null,scale=1,ox=0,oy=-440,drag=null,lastTap=0,moveMode=false,selectedBuilding=-1,rotateNext=false;
+function openRoadMenu(){
+ const content=document.getElementById('sheetContent');
+ document.getElementById('sheetTitle').textContent='🛣️ Roads & Sidewalks';
+ content.innerHTML='<p class="notice">Select a surface, close this menu, and tap owned empty tiles to paint. Swipe the map to move around. Road and sidewalk tiles are free, but land must be unlocked first. Tap Eraser to remove your paths.</p>'+
+ [['road','🛣️ Asphalt road'],['sidewalk','🚶 Concrete sidewalk'],['dirt','🌾 Dirt path'],['erase','🧽 Eraser']].map(([id,name])=>'<div class="task"><b>'+name+'</b><button onclick="selectPathBrush(\''+id+'\')">Select</button></div>').join('')+
+ '<button onclick="selectPathBrush(null)">✔ Done editing</button>';
+ document.getElementById('menuShade').classList.add('open');
+}
+function selectPathBrush(brush){pathBrush=brush;window.pendingBuild=null;moveMode=false;closePanel();document.querySelector('.hint').textContent=brush?'Road editor: tap owned land to paint · Drag to pan · Pinch to zoom':'Drag to move · Pinch to zoom · Tap a resident to give them a task';requestDraw()}
+function paintPath(tile){if(!tile)return;
+ if(!landOwned(tile.x,tile.y)){openLandMenu();return}
+ if(occupied(tile.x,tile.y,1,1)){alert('Move the building before adding a path here.');return}
+ const key=tile.x+','+tile.y;
+ if(pathBrush==='erase')delete s.paths[key];else s.paths[key]=pathBrush;
+ save();requestDraw();
+}
+function drawPaths(){
+ const entries=Object.entries(s.paths);if(!entries.length)return;
+ ctx.save();
+ for(const [key,kind] of entries){const coords=key.split(',').map(Number),x=coords[0],y=coords[1];if(!landOwned(x,y))continue;
+ const p=project(x,y),hw=TW*scale/2,hh=TH*scale/2;
+ ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(p.x+hw,p.y+hh);ctx.lineTo(p.x,p.y+2*hh);ctx.lineTo(p.x-hw,p.y+hh);ctx.closePath();
+ ctx.fillStyle=kind==='road'?'#777b80':kind==='sidewalk'?'#d8d4c9':'#bc9a65';ctx.fill();
+ ctx.strokeStyle=kind==='road'?'#c4c8c9':kind==='sidewalk'?'#f8f3e8':'#8c7145';ctx.lineWidth=Math.max(.6,scale);ctx.stroke();
+ if(kind==='road'){
+  const adjacent=(dx,dy)=>s.paths[(x+dx)+','+(y+dy)]==='road';
+  ctx.strokeStyle='#f7e8a7';ctx.lineWidth=Math.max(1,1.5*scale);ctx.setLineDash([5*scale,6*scale]);
+  if(adjacent(1,0)||adjacent(-1,0)){ctx.beginPath();ctx.moveTo(p.x-hw*.45,p.y+hh*.55);ctx.lineTo(p.x+hw*.45,p.y+hh*1.45);ctx.stroke()}
+  if(adjacent(0,1)||adjacent(0,-1)){ctx.beginPath();ctx.moveTo(p.x+hw*.45,p.y+hh*.55);ctx.lineTo(p.x-hw*.45,p.y+hh*1.45);ctx.stroke()}
+  ctx.setLineDash([]);
+ }
+ }
+ ctx.restore();
+}
 function save(){localStorage.setItem('os_iso_save',JSON.stringify(s))}
 function resize(){let r=canvas.getBoundingClientRect(),dpr=Math.min(devicePixelRatio||1,1.5);canvas.width=Math.round(r.width*dpr);canvas.height=Math.round(r.height*dpr);ctx.setTransform(dpr,0,0,dpr,0,0);backgroundKey='';backgroundCanvas=null;requestDraw()}
 function iso(x,y){return {x:(x-y)*TW/2,y:(x+y)*TH/2}}
@@ -435,6 +471,7 @@ function draw(){let W=canvas.clientWidth,H=canvas.clientHeight;if(!W||!H)return;
   const frontier=landAdjacent(px,py);ctx.fillStyle=frontier?'#5a739466':'#2a4b3866';ctx.fill();ctx.strokeStyle=frontier?'#ffe87a':'#496b4b';ctx.lineWidth=frontier?2:1;ctx.stroke();
   if(frontier&&scale>.58){const p=project(px*PLOT+2,py*PLOT+2);ctx.font=`bold ${Math.max(10,13*scale)}px system-ui`;ctx.textAlign='center';ctx.fillStyle='#fff4c5';ctx.strokeStyle='#3b4d36';ctx.lineWidth=3;ctx.strokeText('＋',p.x,p.y);ctx.fillText('＋',p.x,p.y)}
  }
+ drawPaths();
  s.placed.slice().sort((a,b)=>(a.x+a.y)-(b.x+b.y)).forEach(b=>{
   drawBuilding(b);
   if(isBuildingUnderConstruction(b)){
@@ -504,6 +541,7 @@ function finishPointer(e,cancelled=false){
  if(pointers.size===0){lastPointer=null;isPanning=false;pinchDistance=0}
  if(cancelled||!wasSingle||wasPan||wasGesture){if(!pointers.size)startPt=null;return}
  const r=canvas.getBoundingClientRect(),px=e.clientX-r.left,py=e.clientY-r.top;
+ if(pathBrush){paintPath(hitTile(px,py));startPt=null;return}
  if(moveMode&&selectedBuilding>=0){let t=hitTile(px,py);if(t){let b=s.placed[selectedBuilding],bw=b.rotation%2?b.h:b.w,bh=b.rotation%2?b.w:b.h;if(!footprintOwned(t.x,t.y,bw,bh)){alert('Buy this land before moving here.');startPt=null;return}if(!occupied(t.x,t.y,bw,bh,selectedBuilding)){b.x=t.x;b.y=t.y;save();moveMode=false;selectedBuilding=-1;chosen=null;refresh();requestDraw()}else alert('That space is occupied.')}startPt=null;return}
  if(!window.pendingBuild){const resident=hitResident(px,py);if(resident){openCharacter(resident);startPt=null;return}}
  let hit=-1;for(let i=s.placed.length-1;i>=0;i--){let b=s.placed[i],bw=b.rotation%2?b.h:b.w,bh=b.rotation%2?b.w:b.h,p=project(b.x+bw/2,b.y+bh/2);if(Math.hypot(px-p.x,py-(p.y-12*scale))<34*scale){hit=i;break}}
@@ -576,7 +614,7 @@ function restoreBuilding(i){
 function rotateSelected(){if(selectedBuilding>=0){let b=s.placed[selectedBuilding],next=(b.rotation+1)%2,w=next?b.h:b.w,h=next?b.w:b.h;if(!footprintOwned(b.x,b.y,w,h)||occupied(b.x,b.y,w,h,selectedBuilding)){alert('Not enough free unlocked land to rotate.');return}b.rotation=next;save();draw();refresh()}else if(window.pendingBuild){rotateNext=!rotateNext;alert('Next building placement: '+(rotateNext?'rotated':'normal orientation'))}else alert('Select a placed building or choose one from Build first.')}
 function beginMove(){if(selectedBuilding<0){alert('Tap a building on the map first, then choose Move.');return}moveMode=true;alert('Tap an open tile to move the selected building.')}
 
-function openPanel(which){const shade=document.getElementById('menuShade'),content=document.getElementById('sheetContent');const panels=[...document.querySelectorAll('#gamePanels .panel')];let index={build:0,residents:1,income:2,friends:3}[which];if(index===undefined)return;content.innerHTML='';let clone=panels[index].cloneNode(true);clone.classList.add('active');content.appendChild(clone);document.getElementById('sheetTitle').textContent={build:'🏗️ Build',residents:'🧍 Residents',income:'💰 Building income',friends:'👥 Friends'}[which];shade.classList.add('open');if(which==='build')buildMenuIn(clone);if(which==='residents')renderResidentsIn(clone);if(which==='income')renderIncomeIn(clone)}
+function openPanel(which){if(which==='build'&&pathBrush)selectPathBrush(null);const shade=document.getElementById('menuShade'),content=document.getElementById('sheetContent');const panels=[...document.querySelectorAll('#gamePanels .panel')];let index={build:0,residents:1,income:2,friends:3}[which];if(index===undefined)return;content.innerHTML='';let clone=panels[index].cloneNode(true);clone.classList.add('active');content.appendChild(clone);document.getElementById('sheetTitle').textContent={build:'🏗️ Build',residents:'🧍 Residents',income:'💰 Building income',friends:'👥 Friends'}[which];shade.classList.add('open');if(which==='build')buildMenuIn(clone);if(which==='residents')renderResidentsIn(clone);if(which==='income')renderIncomeIn(clone)}
 function closePanel(){document.getElementById('menuShade').classList.remove('open')}
 function buildMenuIn(root){let oldTabs=root.querySelector('#tabs'),oldCatalog=root.querySelector('#catalog');if(oldTabs)oldTabs.id='tabs';if(oldCatalog)oldCatalog.id='catalog';buildMenu()}
 function renderResidentsIn(root){let target=root.querySelector('#residents');if(target)target.innerHTML=document.getElementById('residents').innerHTML}
