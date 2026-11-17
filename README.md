@@ -1,9 +1,7 @@
-# Our Springfield v2.6
+# Our Springfield v2.7 — Illustrated artwork update
 
-Character personality update:
-- Tap residents to trigger original dialogue bubbles and a waving gesture.
-- Walking bob and occasional blinking for expressive cartoon residents.
-- Hourglass indicator over residents performing timed jobs.
-- Existing saves, town layout, levels, land, and unlimited currencies preserved.
+This update replaces the procedural art for the first four characters and common homes, shops, civic buildings and schools with original illustrated PNG sprites.
 
-Install: Extract the ZIP and replace index.html in your GitHub Pages repository. Do not upload the ZIP itself.
+Extract the ZIP and upload BOTH index.html AND the entire assets folder to your GitHub Pages repository. If you upload only index.html, the illustrations cannot appear.
+
+This version does not intentionally reset progress. Existing game systems and save keys are unchanged.

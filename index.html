@@ -417,12 +417,32 @@ function diamond(x,y,fill){let p=project(x,y);poly([{x:p.x,y:p.y},{x:p.x+TW/2*sc
 function buildingInk(points,fill,stroke='#42372f',line=2){poly(points,fill,stroke);ctx.lineWidth=line*scale}
 function windowAt(x,y,z=1){let a=scale*z;ctx.fillStyle='#a9e8f3';ctx.strokeStyle='#3d3531';ctx.lineWidth=2*a;ctx.fillRect(x-7*a,y-10*a,14*a,18*a);ctx.strokeRect(x-7*a,y-10*a,14*a,18*a);ctx.strokeStyle='#f7f8e5';ctx.lineWidth=1.5*a;ctx.beginPath();ctx.moveTo(x,y-9*a);ctx.lineTo(x,y+7*a);ctx.moveTo(x-6*a,y-1*a);ctx.lineTo(x+6*a,y-1*a);ctx.stroke();ctx.fillStyle='#f8f0c8';ctx.fillRect(x-9*a,y+8*a,18*a,3*a)}
 function shrubAt(x,y,r=7){let a=scale;ctx.fillStyle='#276c3b';ctx.strokeStyle='#274e32';ctx.lineWidth=2*a;ctx.beginPath();ctx.arc(x-r*a*.6,y, r*a*.8,0,7);ctx.arc(x+r*a*.5,y-3*a,r*a,0,7);ctx.fill();ctx.stroke();ctx.fillStyle='#70c95a';ctx.beginPath();ctx.arc(x+r*a*.25,y-5*a,r*a*.5,0,7);ctx.fill()}
+// v2.7: real illustrated sprite assets, loaded once and reused on the canvas.
+const illustratedSprites={};
+for(const id of ['mayor','riley','casey','coach','house','shop','civic','school']){
+ const pic=new Image();pic.onload=()=>requestDraw();pic.src='assets/'+id+'.png';illustratedSprites[id]=pic;
+}
+function paintedSprite(id,x,baseline,w,h){
+ const pic=illustratedSprites[id];
+ if(!pic||!pic.complete||!pic.naturalWidth)return false;
+ ctx.drawImage(pic,x-w/2,baseline-h,w,h);return true;
+}
+function buildingSpriteId(b){
+ const n=(b.name||'').toLowerCase();
+ if(n.includes('school')||n.includes('academy'))return 'school';
+ if(b.cat==='Civic'||n.includes('hall')||n.includes('library'))return 'civic';
+ if(b.cat==='Shops'||n.includes('store')||n.includes('market')||n.includes('cafe'))return 'shop';
+ if(b.cat==='Homes'||n.includes('cottage')||n.includes('house')||n.includes('residence'))return 'house';
+ return null;
+}
 function drawBuilding(b){
  const bw=b.rotation%2?b.h:b.w,bh=b.rotation%2?b.w:b.h;
  const p=project(b.x+bw/2,b.y+bh/2),a=scale;
  const w=(bw+bh)*TW/4*a,h=(bw+bh)*TH/4*a,ht=(b.cat==='Civic'?55:b.cat==='Shops'?45:39)*a;
  const ink='#43342c',left=b.color||'#f0c786',right=shade(left);
  const park=['Decor','Nature'].includes(b.cat)||b.name==='Forest Camp'||(b.cat==='Events'&&['Pumpkin Patch','Spooky Graveyard','Snowman Square','Heart Garden','Egg Hunt Park','Summer Beach'].includes(b.name));
+ const spriteId=buildingSpriteId(b);
+ if(spriteId && !b.buildEndsAt && paintedSprite(spriteId,p.x,p.y+17*a,Math.max(110,Math.min(215,((bw+bh)*TW/4+38)*a)),Math.max(95,Math.min(180,((bw+bh)*TW/4+38)*a*.83))))return;
  ctx.save();ctx.lineJoin='round';ctx.lineCap='round';
  ctx.fillStyle='#32582d55';ctx.beginPath();ctx.ellipse(p.x,p.y+12*a,w*.72,h*.8,0,0,7);ctx.fill();
  if(park){
@@ -535,6 +555,10 @@ function residentSpeech(x,y,z,text){
 function drawResident(c,x,y,index,walking=false,phase=0){
  const p=project(x,y),z=scale*1.42,skin='#f4cf45',outline='#3d3028';
  const reaction=residentReactions.get(c.name),reacting=reaction&&reaction.until>Date.now();
+ const spriteId=['mayor','riley','casey','coach'][index%4];
+ const drawn=paintedSprite(spriteId,p.x,p.y+8*z,Math.max(38,43*z),Math.max(62,69*z));
+ if(drawn)return;
+
  const bob=walking?Math.abs(Math.sin(phase))*1.5*z:Math.sin(phase*.2)*.45*z;
  p.y-=bob;
  const shirts=['#f4f0e5','#e36e9d','#477d55','#9873b8'];
