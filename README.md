@@ -1,1 +1,1 @@
-Our Springfield v2.3 — landscaping update. Replace index.html in your GitHub Pages repository. Adds trees, pines, bushes, flowers, lamps and benches through Roads & Landscaping editor. Existing saves are retained.
+Our Springfield v2.4: Smooth neighborhood walking loops, animated footsteps and arms, offscreen character culling. Upload index.html to GitHub Pages. Existing local progress preserved.

@@ -466,15 +466,15 @@ function drawBackground(){if(backgroundCanvas)return backgroundCanvas;
  scale=oldScale;ox=oldOx;oy=oldOy;return backgroundCanvas;
 }
 
-function drawResident(c,x,y,index){
+function drawResident(c,x,y,index,walking=false,phase=0){
  const p=project(x,y),z=scale*1.42,skin='#f4cf45',outline='#3d3028';
  const shirts=['#f4f0e5','#e36e9d','#477d55','#9873b8'];
  ctx.save();ctx.lineCap='round';ctx.lineJoin='round';ctx.lineWidth=2*z;ctx.strokeStyle=outline;
  // feet and legs
- ctx.fillStyle='#344d70';ctx.beginPath();ctx.roundRect(p.x-5*z,p.y-8*z,4*z,13*z,2*z);ctx.roundRect(p.x+1*z,p.y-8*z,4*z,13*z,2*z);ctx.fill();ctx.stroke();
- ctx.fillStyle='#f7f3e9';ctx.beginPath();ctx.ellipse(p.x-4*z,p.y+6*z,5*z,2.5*z,0,0,Math.PI*2);ctx.ellipse(p.x+5*z,p.y+6*z,5*z,2.5*z,0,0,Math.PI*2);ctx.fill();ctx.stroke();
+ ctx.fillStyle='#344d70';ctx.beginPath();const stride=walking?Math.sin(phase)*3.2*z:0;ctx.roundRect(p.x-5*z+stride,p.y-8*z,4*z,13*z,2*z);ctx.roundRect(p.x+1*z-stride,p.y-8*z,4*z,13*z,2*z);ctx.fill();ctx.stroke();
+ ctx.fillStyle='#f7f3e9';ctx.beginPath();ctx.ellipse(p.x-4*z+stride,p.y+6*z,5*z,2.5*z,0,0,Math.PI*2);ctx.ellipse(p.x+5*z-stride,p.y+6*z,5*z,2.5*z,0,0,Math.PI*2);ctx.fill();ctx.stroke();
  // arms behind torso
- ctx.strokeStyle=skin;ctx.lineWidth=4*z;ctx.beginPath();ctx.moveTo(p.x-6*z,p.y-23*z);ctx.lineTo(p.x-10*z,p.y-9*z);ctx.moveTo(p.x+6*z,p.y-23*z);ctx.lineTo(p.x+10*z,p.y-9*z);ctx.stroke();
+ ctx.strokeStyle=skin;ctx.lineWidth=4*z;ctx.beginPath();ctx.moveTo(p.x-6*z,p.y-23*z);ctx.lineTo(p.x-10*z-stride*.55,p.y-9*z);ctx.moveTo(p.x+6*z,p.y-23*z);ctx.lineTo(p.x+10*z+stride*.55,p.y-9*z);ctx.stroke();
  ctx.fillStyle=skin;ctx.beginPath();ctx.arc(p.x-10*z,p.y-8*z,2.5*z,0,Math.PI*2);ctx.arc(p.x+10*z,p.y-8*z,2.5*z,0,Math.PI*2);ctx.fill();ctx.strokeStyle=outline;ctx.lineWidth=1*z;ctx.stroke();
  // shirt with collar
  ctx.fillStyle=shirts[index%shirts.length];ctx.strokeStyle=outline;ctx.lineWidth=1.8*z;ctx.beginPath();ctx.moveTo(p.x-7*z,p.y-25*z);ctx.quadraticCurveTo(p.x,p.y-29*z,p.x+7*z,p.y-25*z);ctx.lineTo(p.x+7*z,p.y-9*z);ctx.quadraticCurveTo(p.x,p.y-6*z,p.x-7*z,p.y-9*z);ctx.closePath();ctx.fill();ctx.stroke();
@@ -520,14 +520,20 @@ function draw(){let W=canvas.clientWidth,H=canvas.clientHeight;if(!W||!H)return;
  chars.filter(c=>isCharacterUnlocked(c)).forEach((c,i)=>{
   const busy=!!s.tasks[c.name]&&s.tasks[c.name].endsAt>now;
   const t=now/1000+i*2.3;
-  const homeX=3.4+i*2.1,homeY=5.2+(i%2)*2.1;
-  const wander=busy?0:1;
-  const x=homeX+Math.sin(t*.55)*.42*wander;
-  const y=homeY+Math.cos(t*.55)*.27*wander;
+  const homeX=3.4+(i%5)*2.1,homeY=5.2+Math.floor(i/5)*2.5;
+  // Residents follow short, looping neighborhood routes rather than vibrating in place.
+  // Keep the route deterministic so it works without saving movement every frame.
+  const route=[[0,0],[.85,0],[1.2,.65],[.4,1.05],[-.45,.65],[0,0]];
+  const segment=busy?0:Math.floor(t/3)% (route.length-1);
+  const fraction=busy?0:(t/3)%1;
+  const smooth=fraction*fraction*(3-2*fraction);
+  const x=homeX+route[segment][0]*(1-smooth)+route[segment+1][0]*smooth;
+  const y=homeY+route[segment][1]*(1-smooth)+route[segment+1][1]*smooth;
   const foot=project(x,y),z=scale;
   visibleResidents.push({name:c.name,x:foot.x,y:foot.y-40*z,r:Math.max(22,26*z)});
+  if(foot.x < -90 || foot.x > W+90 || foot.y < -110 || foot.y > H+90)return;
   ctx.fillStyle='#31552b55';ctx.beginPath();ctx.ellipse(foot.x,foot.y+5*z,13*z,5*z,0,0,Math.PI*2);ctx.fill();
-  drawResident(c,x,y,chars.indexOf(c));
+  drawResident(c,x,y,chars.indexOf(c),!busy,t*9);
   if(s.tasks[c.name]&&now>=s.tasks[c.name].endsAt){
    ctx.font=`bold ${Math.max(15,20*z)}px system-ui`;ctx.textAlign='center';ctx.fillText('✔️',foot.x,foot.y-78*z);
   }
@@ -683,5 +689,5 @@ function activateEvent(e){if(!SEASONS.includes(e))return;s.activeEvent=e;save();
 function dailyReward(){let day=new Date().toLocaleDateString('en-CA');if(s.dailyClaim===day){alert('You already collected today!');return}s.dailyClaim=day;s.xp+=30;save();refresh();alert('Daily visit reward: 30 XP!');openEvents()}
 function openTaskBook(){let q=activeStory();let done=s.storyStage;let rows=`<div class="quest-row"><b>⭐ ${q.title}</b><p>${q.objective}</p><small>Story chapter ${Math.min(done+1,STORY.length)} of ${STORY.length} · Reward: ${q.reward} XP</small><div style="margin-top:8px"><button class="story-action" onclick="closeTaskBook();storyModal()">Story dialogue</button></div></div>`+STORY.slice(0,done).map(a=>`<div class="quest-row"><b>✓ ${a.title}</b><small>Completed · ${a.reward} XP earned</small></div>`).join('');let em=eventMission();if(em.event)rows+='<div class="quest-row"><b>🎉 '+em.event+' · '+em.index+'/'+em.missions.length+'</b><p>'+(em.mission?'Place '+em.mission[0]+' to earn festival XP':'All festival objectives completed!')+'</p></div>';document.getElementById('taskBookContent').innerHTML=rows+'<div class="quest-row"><b>🎉 Festivals and daily rewards</b><p>Unlock themed buildings, change the current event, and collect a daily XP bonus.</p><button onclick="closeTaskBook();openEvents()">Open events</button></div>';document.getElementById('taskShade').classList.add('open')}
 function closeTaskBook(){document.getElementById('taskShade').classList.remove('open')}
-function init(){resize();refresh();draw();setInterval(()=>{if(document.visibilityState==='visible')requestDraw();},400);setInterval(()=>{renderCharacterRail();renderResidents();renderIncome();if(document.getElementById('menuShade').classList.contains('open')){let title=document.getElementById('sheetTitle').textContent;if(title.includes('Residents'))renderResidentsIn(document.getElementById('sheetContent'));if(title.includes('income'))renderIncomeIn(document.getElementById('sheetContent'))}},5000)}window.addEventListener('resize',resize);init();if(!s.storySeen)setTimeout(storyModal,550);
+function init(){resize();refresh();draw();setInterval(()=>{if(document.visibilityState==='visible')requestDraw();},120);setInterval(()=>{renderCharacterRail();renderResidents();renderIncome();if(document.getElementById('menuShade').classList.contains('open')){let title=document.getElementById('sheetTitle').textContent;if(title.includes('Residents'))renderResidentsIn(document.getElementById('sheetContent'));if(title.includes('income'))renderIncomeIn(document.getElementById('sheetContent'))}},5000)}window.addEventListener('resize',resize);init();if(!s.storySeen)setTimeout(storyModal,550);
 </script></body></html>
