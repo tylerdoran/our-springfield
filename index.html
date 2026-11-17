@@ -38,20 +38,38 @@ nav{position:fixed;bottom:0;left:0;right:0;background:#fff9f1;border-top:1px sol
 .rotate-prompt{display:none;position:fixed;inset:0;background:#382c36;z-index:20;color:white;align-items:center;justify-content:center;text-align:center;padding:30px}
 @media (orientation:portrait) and (max-width:700px){.rotate-prompt{display:flex}.rotate-prompt div{max-width:280px}.rotate-prompt .phone{font-size:52px;display:block;margin-bottom:12px}.rotate-prompt b{font-size:20px}.rotate-prompt p{color:#f7dce8;font-size:14px;line-height:1.5}}
 
+
+/* Compact town-first, Tapped Out-inspired landscape HUD */
+@media (orientation:landscape) and (max-height:700px) {
+ body{background:#8fc982} header{height:42px;padding:0 12px} .brand{font-size:15px}.pill{padding:4px 9px;font-size:11px}
+ main{height:calc(100dvh - 42px);max-width:none;padding:4px 6px 44px;overflow:hidden}
+ .status{height:24px;margin:0 4px 3px;font-size:11px}.level{font-size:12px}.xp{height:6px;width:105px}
+ .layout{display:block;height:calc(100% - 27px)}.town-area{height:100%;min-height:0}
+ .scene{height:100%;min-height:0;border:2px solid #fff;border-radius:10px;box-shadow:0 2px 8px #355a5130}
+ .right{display:none!important}.quest-float{position:absolute;left:8px;top:8px;width:min(245px,34%);background:#fff8edee;border:1px solid #fff;border-radius:10px;padding:7px 9px;box-shadow:0 2px 7px #263b2930;pointer-events:none}.quest-float b{font-size:11px}.quest-float small{float:right;font-size:10px}.quest-float .notice{font-size:10px;margin-top:3px;line-height:1.25}
+ .build-controls{position:absolute;right:8px;top:8px;display:flex;gap:5px}.build-controls button{border:0;border-radius:9px;padding:6px 9px;background:#87506d;color:#fff;font-weight:800;font-size:10px}
+ nav{height:42px;padding:3px 4px calc(3px + env(safe-area-inset-bottom));background:#fff9f1eF;backdrop-filter:blur(8px)}nav button{font-size:9px}nav span{font-size:17px}
+ .menu-shade{display:none;position:fixed;inset:42px 0 42px;background:#24192366;z-index:10;align-items:flex-end;justify-content:center}.menu-shade.open{display:flex}
+ .menu-sheet{width:min(680px,96vw);max-height:90%;overflow:auto;background:#fff8ed;border:2px solid #fff;border-radius:16px 16px 0 0;padding:9px 12px 14px;box-shadow:0 -4px 20px #24192333}
+ .sheet-head{display:flex;justify-content:space-between;align-items:center;padding-bottom:7px;border-bottom:1px solid #ead4de;margin-bottom:8px}.sheet-head b{font-size:14px}.sheet-head button{border:0;border-radius:8px;background:#87506d;color:#fff;padding:5px 9px;font-weight:900}
+ #sheetContent .panel{display:none!important}#sheetContent .panel.active{display:block!important;margin:0;padding:2px;border:0;box-shadow:none;background:transparent}
+ #sheetContent .cards{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}#sheetContent .card{padding:7px}#sheetContent .task{padding:7px;margin:4px 0}
+}
+@media (orientation:portrait) and (max-width:700px){.menu-shade{display:none!important}}
 </style></head><body>
 <header><div class="brand">🍩 OUR SPRINGFIELD</div><div class="balances"><div class="pill">💵 ∞</div><div class="pill">🍩 ∞</div></div></header>
 <main>
 <div class="status"><div><span class="level" id="level">LEVEL 1</span><span class="xp"><i id="xpbar"></i></span> <small id="xptext">0 / 100 XP</small></div><strong id="townName">Your Town</strong></div>
-<div class="layout"><div>
-<div class="scene"><canvas id="town"></canvas><div class="hint">Drag map to pan · Scroll to zoom · Tap land to build or select a building</div></div><div class="mini-actions"><button onclick="beginMove()">↔ Move selected building</button><button onclick="rotateSelected()">⟳ Rotate 90°</button></div>
-<div class="panel"><div class="row"><h3>📜 Current task</h3><small id="questCount">0 / 3</small></div><div id="quest" class="notice">Welcome! Place your first home to begin building your town.</div></div>
-</div><div class="right">
+<div class="layout"><div class="town-area">
+<div class="scene"><canvas id="town"></canvas><div class="hint">Drag to move around · Pinch to zoom · Tap a building to select</div><div class="quest-float"><b>📜 Current task</b><small id="questCount">0 / 3</small><div id="quest" class="notice">Welcome! Place your first home to begin building your town.</div></div><div class="build-controls"><button onclick="beginMove()">↔ Move</button><button onclick="rotateSelected()">⟳ Rotate</button></div></div>
+</div><div class="right" id="gamePanels">
 <section class="panel"><h3>🏗️ Build menu</h3><div class="toolbar" id="tabs"></div><div class="cards" id="catalog"></div></section>
 <section class="panel"><h3>🧍 Residents & tasks</h3><div id="residents"></div></section><section class="panel"><h3>💰 Building income</h3><div id="income"></div></section>
 <section class="panel"><h3>👥 Friends</h3><p class="notice">Your own town is saved on this device for now. Online accounts, invitations, cloud saves, and town visits are the next multiplayer milestone.</p><button onclick="alert('Friend invitations will be enabled when the online account system is connected.')">＋ Invite friends</button></section>
 </div></div>
 </main>
-<nav><button onclick="window.scrollTo({top:0,behavior:'smooth'})"><span>🏡</span>Town</button><button onclick="document.getElementById('catalog').scrollIntoView({behavior:'smooth'})"><span>🏗️</span>Build</button><button onclick="document.getElementById('residents').scrollIntoView({behavior:'smooth'})"><span>🧍</span>Residents</button><button onclick="document.querySelector('.right .panel:last-child').scrollIntoView({behavior:'smooth'})"><span>👥</span>Friends</button></nav>
+<div class="menu-shade" id="menuShade" onclick="closePanel()"><div class="menu-sheet" onclick="event.stopPropagation()"><div class="sheet-head"><b id="sheetTitle">Menu</b><button onclick="closePanel()">✕</button></div><div id="sheetContent"></div></div></div>
+<nav><button onclick="closePanel()"><span>🏡</span>Town</button><button onclick="openPanel('build')"><span>🏗️</span>Build</button><button onclick="openPanel('residents')"><span>🧍</span>Residents</button><button onclick="openPanel('income')"><span>💰</span>Income</button><button onclick="openPanel('friends')"><span>👥</span>Friends</button></nav>
 <div class="rotate-prompt"><div><span class="phone">📱↻</span><b>Turn your phone sideways</b><p>Our Springfield is designed to be played horizontally. Rotate your iPhone to landscape to continue.</p></div></div>
 <script>
 const canvas=document.getElementById('town'),ctx=canvas.getContext('2d');
@@ -116,7 +134,7 @@ canvas.addEventListener('pointercancel',()=>{drag=false;startPt=null});
 canvas.addEventListener('wheel',e=>{e.preventDefault();scale=Math.max(.65,Math.min(1.8,scale+(e.deltaY<0?.08:-.08)));backgroundKey='';draw()},{passive:false});
 function occupied(x,y,w,h,ignore=-1){return s.placed.some((p,i)=>{if(i===ignore)return false;let pw=p.rotation%2?p.h:p.w,ph=p.rotation%2?p.w:p.h;return x<p.x+pw&&x+w>p.x&&y<p.y+ph&&y+h>p.y})}
 function placePending(t){let b=window.pendingBuild,bw=rotateNext?b.h:b.w,bh=rotateNext?b.w:b.h;if(occupied(t.x,t.y,bw,bh)){alert('That space is occupied. Choose another spot.');return}s.placed.push({...b,x:t.x,y:t.y,rotation:rotateNext?1:0,lastCollected:Date.now()});rotateNext=false;s.xp+=25;s.quests=Math.min(3,s.quests+1);save();refresh();draw()}
-function buildMenu(){let cats=['All',...new Set(items.map(i=>i.cat))];document.getElementById('tabs').innerHTML=cats.map(c=>`<button class="${c===cat?'active':''}" onclick="cat='${c}';buildMenu()">${c}</button>`).join('');let arr=items.filter(i=>cat==='All'||i.cat===cat);document.getElementById('catalog').innerHTML=arr.map(b=>`<div class="card ${b.level>s.level?'locked':''}"><div class="emoji">${b.emoji}</div><div><b>${b.name}</b><small>${b.level>s.level?'Unlocks at level '+b.level:'Free · Level '+b.level}</small></div><button ${b.level>s.level?'disabled':''} onclick="selectBuild('${b.name}')">${b.level>s.level?'Locked':'Place'}</button></div>`).join('')}
+function buildMenu(){let cats=['All',...new Set(items.map(i=>i.cat))];let tabs=cats.map(c=>`<button class="${c===cat?'active':''}" onclick="cat='${c}';buildMenu()">${c}</button>`).join('');let arr=items.filter(i=>cat==='All'||i.cat===cat);let cards=arr.map(b=>`<div class="card ${b.level>s.level?'locked':''}"><div class="emoji">${b.emoji}</div><div><b>${b.name}</b><small>${b.level>s.level?'Unlocks at level '+b.level:'Free · Level '+b.level}</small></div><button ${b.level>s.level?'disabled':''} onclick="selectBuild('${b.name}')">${b.level>s.level?'Locked':'Place'}</button></div>`).join('');document.querySelectorAll('#tabs').forEach(el=>el.innerHTML=tabs);document.querySelectorAll('#catalog').forEach(el=>el.innerHTML=cards)}
 function selectBuild(name){let b=items.find(x=>x.name===name);window.pendingBuild=b;alert('Tap an open spot on the town map to place '+name+'.')}
 function refresh(){document.getElementById('level').textContent='LEVEL '+s.level;while(s.xp>=s.level*100){s.xp-=s.level*100;s.level++}document.getElementById('xptext').textContent=s.xp+' / '+(s.level*100)+' XP';document.getElementById('xpbar').style.width=Math.min(100,s.xp/(s.level*100)*100)+'%';document.getElementById('townName').textContent=s.town;document.getElementById('questCount').textContent=s.quests+' / 3';document.getElementById('quest').textContent=s.quests>=3?'First neighborhood started! Keep placing buildings and unlock new content as you level up.':'Place '+(3-s.quests)+' more building(s) to complete your first town-building task.';renderResidents();renderIncome();buildMenu();save()}
 
@@ -130,5 +148,10 @@ function collectIncome(i){let b=s.placed[i];if(!b)return;let now=Date.now(),n=Ma
 function rotateSelected(){if(selectedBuilding>=0){s.placed[selectedBuilding].rotation=(s.placed[selectedBuilding].rotation+1)%2;save();draw();refresh()}else if(window.pendingBuild){rotateNext=!rotateNext;alert('Next building placement: '+(rotateNext?'rotated':'normal orientation'))}else alert('Select a placed building or choose one from Build first.')}
 function beginMove(){if(selectedBuilding<0){alert('Tap a building on the map first, then choose Move.');return}moveMode=true;alert('Tap an open tile to move the selected building.')}
 
-function init(){resize();refresh();draw();setInterval(()=>{renderResidents();renderIncome()},5000)}window.addEventListener('resize',resize);init();
+function openPanel(which){const shade=document.getElementById('menuShade'),content=document.getElementById('sheetContent');const panels=[...document.querySelectorAll('#gamePanels .panel')];let index={build:0,residents:1,income:2,friends:3}[which];if(index===undefined)return;content.innerHTML='';let clone=panels[index].cloneNode(true);clone.classList.add('active');content.appendChild(clone);document.getElementById('sheetTitle').textContent={build:'🏗️ Build',residents:'🧍 Residents',income:'💰 Building income',friends:'👥 Friends'}[which];shade.classList.add('open');if(which==='build')buildMenuIn(clone);if(which==='residents')renderResidentsIn(clone);if(which==='income')renderIncomeIn(clone)}
+function closePanel(){document.getElementById('menuShade').classList.remove('open')}
+function buildMenuIn(root){let oldTabs=root.querySelector('#tabs'),oldCatalog=root.querySelector('#catalog');if(oldTabs)oldTabs.id='tabs';if(oldCatalog)oldCatalog.id='catalog';buildMenu()}
+function renderResidentsIn(root){let target=root.querySelector('#residents');if(target)target.innerHTML=document.getElementById('residents').innerHTML}
+function renderIncomeIn(root){let target=root.querySelector('#income');if(target)target.innerHTML=document.getElementById('income').innerHTML}
+function init(){resize();refresh();draw();setInterval(()=>{renderResidents();renderIncome();if(document.getElementById('menuShade').classList.contains('open')){let title=document.getElementById('sheetTitle').textContent;if(title.includes('Residents'))renderResidentsIn(document.getElementById('sheetContent'));if(title.includes('income'))renderIncomeIn(document.getElementById('sheetContent'))}},5000)}window.addEventListener('resize',resize);init();
 </script></body></html>
