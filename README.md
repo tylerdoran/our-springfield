@@ -13,3 +13,6 @@ Upload all files in this folder to the existing GitHub Pages repository, replaci
 
 ## Important
 This remains a front-end prototype. Town data is stored on each device. Online accounts, cloud saves, friend invitations, and visiting other towns still require a backend and are not included yet.
+
+
+Version 0.4 update: landscape-first iPhone layout with a rotate-your-phone prompt in portrait, a wider town view, and a cached terrain layer to reduce repeated canvas drawing. Building placement hit detection is more forgiving, and the service worker cache has been versioned so updated files replace the older cached app.

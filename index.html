@@ -1,16 +1,16 @@
 <!doctype html>
 <html lang="en"><head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#f38db8"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="default">
 <link rel="manifest" href="manifest.webmanifest"><title>Our Springfield</title>
 <style>
 :root{--pink:#f38db8;--plum:#76445f;--cream:#fff8ed;--ink:#382c36}
-*{box-sizing:border-box}body{margin:0;background:#d7e9ee;color:var(--ink);font-family:system-ui,-apple-system,sans-serif;overflow-x:hidden}
+*{box-sizing:border-box}body{margin:0;background:#d7e9ee;color:var(--ink);font-family:system-ui,-apple-system,sans-serif;overflow:hidden;height:100dvh}
 header{height:64px;background:linear-gradient(90deg,#f7a6c7,#f8c2d8);display:flex;align-items:center;justify-content:space-between;padding:0 14px;box-shadow:0 2px 9px #49334535;position:relative;z-index:2}
 .brand{font-weight:950;font-size:19px}.balances{display:flex;gap:7px}.pill{background:#fff9;border:1px solid #fff;border-radius:20px;padding:6px 10px;font-size:13px;font-weight:900}
-main{max-width:1100px;margin:auto;padding:10px 10px 92px}.status{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:3px 2px 9px}.level{font-weight:900;font-size:14px}.xp{height:8px;background:#ffffffa8;border-radius:8px;overflow:hidden;width:110px;display:inline-block;vertical-align:middle;margin-left:5px}.xp i{display:block;background:#f0b83d;height:100%;width:12%}
-.scene{height:min(66vh,620px);min-height:390px;position:relative;border:4px solid #fff;border-radius:19px;overflow:hidden;background:#8ecb83;box-shadow:0 5px 18px #355a5140;touch-action:none}
-canvas{width:100%;height:100%;display:block;cursor:grab}canvas:active{cursor:grabbing}
+main{max-width:1100px;margin:auto;padding:10px 10px 76px;height:calc(100dvh - 64px);overflow:auto}.status{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:3px 2px 9px}.level{font-weight:900;font-size:14px}.xp{height:8px;background:#ffffffa8;border-radius:8px;overflow:hidden;width:110px;display:inline-block;vertical-align:middle;margin-left:5px}.xp i{display:block;background:#f0b83d;height:100%;width:12%}
+.scene{height:min(66vh,620px);min-height:280px;position:relative;border:4px solid #fff;border-radius:19px;overflow:hidden;background:#8ecb83;box-shadow:0 5px 18px #355a5140;touch-action:none}
+canvas{width:100%;height:100%;display:block;cursor:grab;touch-action:none}canvas:active{cursor:grabbing}
 .hint{position:absolute;left:9px;bottom:8px;background:#fffdf0dd;border-radius:10px;padding:6px 9px;font-size:11px;color:#53634c;pointer-events:none}
 .panel{background:var(--cream);border:2px solid #fff;border-radius:18px;margin-top:11px;padding:12px;box-shadow:0 3px 10px #4a435018}.panel h3{margin:0 0 9px;font-size:16px}
 .toolbar{display:flex;gap:7px;overflow:auto;padding:1px 0 9px}.toolbar button,.actions button{white-space:nowrap;border:0;border-radius:12px;background:#87506d;color:white;font-weight:800;padding:9px 12px}
@@ -19,6 +19,25 @@ canvas{width:100%;height:100%;display:block;cursor:grab}canvas:active{cursor:gra
 .task{background:#fff;border-radius:11px;padding:9px;margin:6px 0;display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:13px}.task button{border:0;border-radius:9px;padding:8px 10px;background:#87506d;color:#fff;font-weight:800}.mini-actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}.mini-actions button{border:0;border-radius:9px;padding:8px 10px;background:#f2d8e4;color:#58364a;font-weight:800}.progress{height:6px;background:#eadde3;border-radius:8px;overflow:hidden;margin-top:5px}.progress i{display:block;height:100%;background:#e89abb}.subtle{font-size:11px;color:#806d78}
 nav{position:fixed;bottom:0;left:0;right:0;background:#fff9f1;border-top:1px solid #e5c5d4;display:flex;justify-content:space-around;padding:7px 3px calc(7px + env(safe-area-inset-bottom));z-index:3}nav button{border:0;background:none;color:#65465a;font-weight:800;font-size:11px;display:flex;flex-direction:column;align-items:center;gap:2px}nav span{font-size:21px}
 @media(min-width:700px){.cards{grid-template-columns:repeat(3,minmax(0,1fr))}.layout{display:grid;grid-template-columns:1.4fr 1fr;gap:12px}.layout .panel{margin-top:0}.layout .right .panel{margin-bottom:11px}.scene{height:650px}}
+/* Landscape-first play area for iPhone */
+@media (orientation:landscape) and (max-height:600px) and (min-width:600px){
+ header{height:42px;padding:0 10px}.brand{font-size:15px}.pill{padding:4px 8px;font-size:11px}
+ main{height:calc(100dvh - 42px);max-width:none;padding:4px 6px 48px;overflow:hidden}
+ .status{height:25px;margin:0 2px 4px;font-size:11px}.level{font-size:12px}.xp{width:90px;height:6px}
+ .layout{display:grid;grid-template-columns:minmax(0,1fr) 270px;gap:7px;height:calc(100% - 29px)}
+ .layout>div:first-child{min-width:0;display:flex;flex-direction:column;min-height:0}
+ .scene{height:auto;min-height:0;flex:1;border-width:2px;border-radius:12px}
+ .hint{font-size:9px;padding:4px 6px}.mini-actions{margin:3px 0;gap:4px}.mini-actions button{padding:5px 7px;font-size:10px}
+ .layout .right{overflow-y:auto;min-width:0;max-height:100%;padding-right:2px}
+ .panel{padding:7px;margin-top:5px;border-radius:12px}.panel h3{font-size:12px;margin-bottom:5px}
+ .toolbar{gap:4px;padding-bottom:5px}.toolbar button{padding:5px 7px;font-size:10px}
+ .cards{grid-template-columns:1fr;gap:4px}.card{padding:5px;gap:5px}.card .emoji{font-size:20px}.card b{font-size:10px}.card small{font-size:9px}.card button{padding:5px;font-size:9px}
+ .task{padding:5px;margin:3px 0;font-size:10px}.task button,.mini-actions button{font-size:9px}
+ nav{padding:3px 2px calc(3px + env(safe-area-inset-bottom));height:38px}nav button{font-size:9px}nav span{font-size:16px}
+}
+.rotate-prompt{display:none;position:fixed;inset:0;background:#382c36;z-index:20;color:white;align-items:center;justify-content:center;text-align:center;padding:30px}
+@media (orientation:portrait) and (max-width:700px){.rotate-prompt{display:flex}.rotate-prompt div{max-width:280px}.rotate-prompt .phone{font-size:52px;display:block;margin-bottom:12px}.rotate-prompt b{font-size:20px}.rotate-prompt p{color:#f7dce8;font-size:14px;line-height:1.5}}
+
 </style></head><body>
 <header><div class="brand">🍩 OUR SPRINGFIELD</div><div class="balances"><div class="pill">💵 ∞</div><div class="pill">🍩 ∞</div></div></header>
 <main>
@@ -33,6 +52,7 @@ nav{position:fixed;bottom:0;left:0;right:0;background:#fff9f1;border-top:1px sol
 </div></div>
 </main>
 <nav><button onclick="window.scrollTo({top:0,behavior:'smooth'})"><span>🏡</span>Town</button><button onclick="document.getElementById('catalog').scrollIntoView({behavior:'smooth'})"><span>🏗️</span>Build</button><button onclick="document.getElementById('residents').scrollIntoView({behavior:'smooth'})"><span>🧍</span>Residents</button><button onclick="document.querySelector('.right .panel:last-child').scrollIntoView({behavior:'smooth'})"><span>👥</span>Friends</button></nav>
+<div class="rotate-prompt"><div><span class="phone">📱↻</span><b>Turn your phone sideways</b><p>Our Springfield is designed to be played horizontally. Rotate your iPhone to landscape to continue.</p></div></div>
 <script>
 const canvas=document.getElementById('town'),ctx=canvas.getContext('2d');
 const TW=72,TH=36;
@@ -55,7 +75,7 @@ let s=JSON.parse(localStorage.getItem('os_iso_save')||'null')||{town:'Your Town'
 s.placed.forEach(b=>{if(!b.lastCollected)b.lastCollected=Date.now();if(!b.rotation)b.rotation=0});if(!s.tasks||Array.isArray(s.tasks))s.tasks={};
 let cat='All',chosen=null,scale=1,ox=0,oy=30,drag=null,lastTap=0,moveMode=false,selectedBuilding=-1,rotateNext=false;
 function save(){localStorage.setItem('os_iso_save',JSON.stringify(s))}
-function resize(){let r=canvas.getBoundingClientRect(),dpr=Math.min(devicePixelRatio||1,2);canvas.width=r.width*dpr;canvas.height=r.height*dpr;ctx.setTransform(dpr,0,0,dpr,0,0);draw()}
+function resize(){let r=canvas.getBoundingClientRect(),dpr=Math.min(devicePixelRatio||1,1.5);canvas.width=Math.round(r.width*dpr);canvas.height=Math.round(r.height*dpr);ctx.setTransform(dpr,0,0,dpr,0,0);backgroundKey='';backgroundCanvas=null;draw()}
 function iso(x,y){return {x:(x-y)*TW/2,y:(x+y)*TH/2}}
 function project(x,y){let p=iso(x,y);return {x:canvas.clientWidth/2+p.x*scale+ox,y:canvas.clientHeight*.42+p.y*scale+oy}}
 function poly(points,fill,stroke='#719a65'){ctx.beginPath();points.forEach((p,i)=>i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y));ctx.closePath();ctx.fillStyle=fill;ctx.fill();ctx.strokeStyle=stroke;ctx.lineWidth=1;ctx.stroke()}
@@ -69,29 +89,31 @@ function drawBuilding(b){let bw=b.rotation%2?b.h:b.w,bh=b.rotation%2?b.w:b.h;let
  ctx.font=`${Math.max(15,25*scale)}px system-ui`;ctx.textAlign='center';ctx.fillText(b.emoji,p.x,p.y-ht*.18);
 }
 function shade(hex){return hex==='#e9b18d'?'#c78c70':'#b98470'}
-function draw(){let W=canvas.clientWidth,H=canvas.clientHeight;ctx.clearRect(0,0,W,H);ctx.fillStyle='#91ce84';ctx.fillRect(0,0,W,H);
- for(let y=0;y<18;y++)for(let x=0;x<22;x++){let col=((x+y)%2)?'#91ce84':'#8bc77d';diamond(x,y,col)}
- // water strip / trees for visual depth
- for(let i=0;i<7;i++){let p=project(14+i,2);ctx.fillStyle='#73c7dc';ctx.fillRect(p.x-5,p.y-8,10,34)}
- for(let i=0;i<9;i++){let x=(i*3+2)%20,y=(i*5+1)%14,p=project(x,y);ctx.font=`${24*scale}px system-ui`;ctx.fillText('🌲',p.x,p.y)}
- // road path in diamond tile coordinates
- [[2,8],[3,8],[4,8],[5,8],[6,8],[7,8],[8,8],[9,8],[10,8],[10,7],[10,6],[10,5]].forEach(([x,y])=>diamond(x,y,'#b9b6ae'));
- // sidewalk edge
+let backgroundCanvas=null,backgroundKey='';
+function drawBackground(W,H){let key=[W,H,scale,ox,oy].join(':');if(backgroundCanvas&&backgroundKey===key)return backgroundCanvas;
+ backgroundCanvas=document.createElement('canvas');backgroundCanvas.width=W;backgroundCanvas.height=H;let bg=backgroundCanvas.getContext('2d');bg.fillStyle='#91ce84';bg.fillRect(0,0,W,H);
+ const tile=(x,y,fill)=>{let p=project(x,y);bg.beginPath();bg.moveTo(p.x,p.y);bg.lineTo(p.x+TW/2*scale,p.y+TH/2*scale);bg.lineTo(p.x,p.y+TH*scale);bg.lineTo(p.x-TW/2*scale,p.y+TH/2*scale);bg.closePath();bg.fillStyle=fill;bg.fill();bg.strokeStyle='#719a65';bg.lineWidth=1;bg.stroke()};
+ for(let y=0;y<18;y++)for(let x=0;x<22;x++)tile(x,y,((x+y)%2)?'#91ce84':'#8bc77d');
+ for(let i=0;i<7;i++){let p=project(14+i,2);bg.fillStyle='#73c7dc';bg.fillRect(p.x-5,p.y-8,10,34)}
+ for(let i=0;i<9;i++){let x=(i*3+2)%20,y=(i*5+1)%14,p=project(x,y);bg.font=`${24*scale}px system-ui`;bg.fillText('🌲',p.x,p.y)}
+ [[2,8],[3,8],[4,8],[5,8],[6,8],[7,8],[8,8],[9,8],[10,8],[10,7],[10,6],[10,5]].forEach(([x,y])=>tile(x,y,'#b9b6ae'));
+ backgroundKey=key;return backgroundCanvas;
+}
+function draw(){let W=canvas.clientWidth,H=canvas.clientHeight;if(!W||!H)return;ctx.clearRect(0,0,W,H);ctx.drawImage(drawBackground(W,H),0,0);
  s.placed.slice().sort((a,b)=>(a.x+a.y)-(b.x+b.y)).forEach(drawBuilding);
- // town residents as small original emoji tokens
  chars.filter(c=>c.level<=s.level).forEach((c,i)=>{let p=project(4+i*2,7+(i%2));ctx.font=`${21*scale}px system-ui`;ctx.fillText(c.emoji,p.x,p.y-8*scale)});
- // selected cursor
  if(chosen){let p=project(chosen.x,chosen.y);ctx.strokeStyle='#ffe16b';ctx.lineWidth=3;ctx.beginPath();ctx.ellipse(p.x,p.y,TW*.55*scale,TH*.55*scale,0,0,Math.PI*2);ctx.stroke()}
 }
-function hitTile(px,py){let best=null,dist=1e9;for(let y=0;y<18;y++)for(let x=0;x<22;x++){let p=project(x+.5,y+.5),d=Math.hypot((px-p.x)/scale,(py-p.y)/scale);if(d<dist){dist=d;best={x,y}}}return dist<40?best:null}
+function hitTile(px,py){let best=null,dist=1e9;for(let y=0;y<18;y++)for(let x=0;x<22;x++){let p=project(x+.5,y+.5),d=Math.hypot((px-p.x)/scale,(py-p.y)/scale);if(d<dist){dist=d;best={x,y}}}return dist<Math.max(24,Math.min(42,TH*1.15*scale))?best:null}
 let startPt=null;
 canvas.addEventListener('pointerdown',e=>{canvas.setPointerCapture(e.pointerId);startPt={x:e.clientX,y:e.clientY,ox,oy};drag=true});
-canvas.addEventListener('pointerup',e=>{if(!drag)return;drag=false;let dx=e.clientX-startPt.x,dy=e.clientY-startPt.y;if(Math.hypot(dx,dy)>7){ox+=dx;oy+=dy;draw();return}let r=canvas.getBoundingClientRect(),px=e.clientX-r.left,py=e.clientY-r.top;
+canvas.addEventListener('pointerup',e=>{if(!drag)return;drag=false;let dx=e.clientX-startPt.x,dy=e.clientY-startPt.y;if(Math.hypot(dx,dy)>7){ox+=dx;oy+=dy;backgroundKey='';draw();return}let r=canvas.getBoundingClientRect(),px=e.clientX-r.left,py=e.clientY-r.top;
  if(moveMode&&selectedBuilding>=0){let t=hitTile(px,py);if(t){let b=s.placed[selectedBuilding],bw=b.rotation%2?b.h:b.w,bh=b.rotation%2?b.w:b.h;if(!occupied(t.x,t.y,bw,bh,selectedBuilding)){b.x=t.x;b.y=t.y;save();moveMode=false;selectedBuilding=-1;refresh();draw()}else alert('That space is occupied.')}return}
  let hit=-1;for(let i=s.placed.length-1;i>=0;i--){let b=s.placed[i],bw=b.rotation%2?b.h:b.w,bh=b.rotation%2?b.w:b.h,p=project(b.x+bw/2,b.y+bh/2);if(Math.hypot(px-p.x,py-(p.y-12*scale))<34*scale){hit=i;break}}
  if(hit>=0){selectedBuilding=hit;chosen={x:s.placed[hit].x,y:s.placed[hit].y};draw();return}
  let t=hitTile(px,py);if(!t)return;chosen=t;if(window.pendingBuild){placePending(t);window.pendingBuild=null}draw()});
-canvas.addEventListener('wheel',e=>{e.preventDefault();scale=Math.max(.65,Math.min(1.8,scale+(e.deltaY<0?.08:-.08)));draw()},{passive:false});
+canvas.addEventListener('pointercancel',()=>{drag=false;startPt=null});
+canvas.addEventListener('wheel',e=>{e.preventDefault();scale=Math.max(.65,Math.min(1.8,scale+(e.deltaY<0?.08:-.08)));backgroundKey='';draw()},{passive:false});
 function occupied(x,y,w,h,ignore=-1){return s.placed.some((p,i)=>{if(i===ignore)return false;let pw=p.rotation%2?p.h:p.w,ph=p.rotation%2?p.w:p.h;return x<p.x+pw&&x+w>p.x&&y<p.y+ph&&y+h>p.y})}
 function placePending(t){let b=window.pendingBuild,bw=rotateNext?b.h:b.w,bh=rotateNext?b.w:b.h;if(occupied(t.x,t.y,bw,bh)){alert('That space is occupied. Choose another spot.');return}s.placed.push({...b,x:t.x,y:t.y,rotation:rotateNext?1:0,lastCollected:Date.now()});rotateNext=false;s.xp+=25;s.quests=Math.min(3,s.quests+1);save();refresh();draw()}
 function buildMenu(){let cats=['All',...new Set(items.map(i=>i.cat))];document.getElementById('tabs').innerHTML=cats.map(c=>`<button class="${c===cat?'active':''}" onclick="cat='${c}';buildMenu()">${c}</button>`).join('');let arr=items.filter(i=>cat==='All'||i.cat===cat);document.getElementById('catalog').innerHTML=arr.map(b=>`<div class="card ${b.level>s.level?'locked':''}"><div class="emoji">${b.emoji}</div><div><b>${b.name}</b><small>${b.level>s.level?'Unlocks at level '+b.level:'Free · Level '+b.level}</small></div><button ${b.level>s.level?'disabled':''} onclick="selectBuild('${b.name}')">${b.level>s.level?'Locked':'Place'}</button></div>`).join('')}
@@ -108,5 +130,5 @@ function collectIncome(i){let b=s.placed[i];if(!b)return;let now=Date.now(),n=Ma
 function rotateSelected(){if(selectedBuilding>=0){s.placed[selectedBuilding].rotation=(s.placed[selectedBuilding].rotation+1)%2;save();draw();refresh()}else if(window.pendingBuild){rotateNext=!rotateNext;alert('Next building placement: '+(rotateNext?'rotated':'normal orientation'))}else alert('Select a placed building or choose one from Build first.')}
 function beginMove(){if(selectedBuilding<0){alert('Tap a building on the map first, then choose Move.');return}moveMode=true;alert('Tap an open tile to move the selected building.')}
 
-function init(){resize();refresh();draw();setInterval(()=>{renderResidents();renderIncome()},1000)}window.addEventListener('resize',resize);init();
+function init(){resize();refresh();draw();setInterval(()=>{renderResidents();renderIncome()},5000)}window.addEventListener('resize',resize);init();
 </script></body></html>
