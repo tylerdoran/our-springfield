@@ -355,6 +355,30 @@ function drawPaths(){
  }
  ctx.restore();
 }
+// v2.5: intersection markings and street furniture drawn in world coordinates.
+function drawStreetDetails(){
+ ctx.save();ctx.lineCap='round';
+ for(const [key,kind] of Object.entries(s.paths)){
+  if(kind!=='road')continue;
+  const [x,y]=key.split(',').map(Number);
+  if(!landOwned(x,y))continue;
+  const p=project(x+.5,y+.5),z=scale;
+  const north=s.paths[x+','+(y-1)]==='road',south=s.paths[x+','+(y+1)]==='road';
+  const east=s.paths[(x+1)+','+y]==='road',west=s.paths[(x-1)+','+y]==='road';
+  const branches=[north,south,east,west].filter(Boolean).length;
+  if(branches>=3){
+   // Compact crossing lines distinguish junctions at normal zoom.
+   ctx.strokeStyle='#fff0bd';ctx.lineWidth=Math.max(1,2*z);
+   for(let i=-1;i<=1;i++){
+    ctx.beginPath();ctx.moveTo(p.x+(i*7-12)*z,p.y+(i*3+1)*z);
+    ctx.lineTo(p.x+(i*7-5)*z,p.y+(i*3+5)*z);ctx.stroke();
+   }
+  }else if(branches===0&&z>.65){
+   ctx.fillStyle='#f2e4a0';ctx.beginPath();ctx.arc(p.x,p.y,2*z,0,Math.PI*2);ctx.fill();
+  }
+ }
+ ctx.restore();
+}
 // v2.3: persistent landscaping, drawn as original vector cartoon scenery.
 function drawLandscaping(){
  const entries=Object.entries(s.landscaping).map(([key,kind])=>{const [x,y]=key.split(',').map(Number);return {x,y,kind}}).filter(o=>landOwned(o.x,o.y)).sort((a,b)=>(a.x+a.y)-(b.x+b.y));
@@ -417,6 +441,25 @@ function drawBuilding(b){
  poly([{x:p.x-w/2-5*a,y:p.y-ht-2*a},{x:p.x,y:p.y-ht-h*.55-roofLift},{x:p.x+w/2+5*a,y:p.y-ht-2*a},{x:p.x,y:p.y-ht+h*.5}],roof,ink);
  // shingles and highlights
  ctx.strokeStyle='#e6b18b';ctx.lineWidth=1.5*a;for(let k=1;k<=3;k++){ctx.beginPath();ctx.moveTo(p.x-w/2+(w*k/8),p.y-ht-2*a-h*.55*k/4);ctx.lineTo(p.x+(w*k/8),p.y-ht+h*.5-h*.55*k/4);ctx.stroke()}
+ // v2.5: silhouettes and details vary by building type, rather than one universal house.
+ const nm=(b.name||'').toLowerCase();
+ if(commercial){
+  // Side-mounted blade sign and warm window glow for active storefronts.
+  ctx.fillStyle='#f7d27d';ctx.strokeStyle=ink;ctx.lineWidth=1.8*a;
+  ctx.fillRect(p.x+w*.32,p.y-ht-12*a,19*a,16*a);ctx.strokeRect(p.x+w*.32,p.y-ht-12*a,19*a,16*a);
+  ctx.fillStyle='#8a473c';ctx.font=`bold ${Math.max(7,10*a)}px system-ui`;ctx.textAlign='center';
+  ctx.fillText(nm.includes('pizza')?'P':nm.includes('coffee')?'C':nm.includes('bakery')?'B':'★',p.x+w*.32+9*a,p.y-ht);
+ }else if(civic){
+  // Extra roof cupola and masonry cornice for civic landmarks.
+  ctx.fillStyle='#e9d6ad';ctx.strokeStyle=ink;ctx.lineWidth=1.7*a;
+  ctx.fillRect(p.x-10*a,p.y-ht-h*.52-17*a,20*a,17*a);ctx.strokeRect(p.x-10*a,p.y-ht-h*.52-17*a,20*a,17*a);
+  poly([{x:p.x-14*a,y:p.y-ht-h*.52-17*a},{x:p.x,y:p.y-ht-h*.52-29*a},{x:p.x+14*a,y:p.y-ht-h*.52-17*a},{x:p.x,y:p.y-ht-h*.52-12*a}],'#496b89',ink);
+ }else if(b.cat==='Industry'||nm.includes('factory')||nm.includes('plant')){
+  // Tall smokestack and ventilation for industrial buildings.
+  ctx.fillStyle='#a46c5c';ctx.strokeStyle=ink;ctx.lineWidth=2*a;
+  ctx.fillRect(p.x+w*.22,p.y-ht-h*.48-30*a,14*a,42*a);ctx.strokeRect(p.x+w*.22,p.y-ht-h*.48-30*a,14*a,42*a);
+  ctx.fillStyle='#ded5c6';ctx.fillRect(p.x+w*.22-2*a,p.y-ht-h*.48-31*a,18*a,5*a);
+ }
  // visible front windows with trim and curtains
  windowAt(p.x-w*.27,p.y-ht*.35);windowAt(p.x+w*.26,p.y-ht*.35);
  if(w>90*a){windowAt(p.x-w*.40,p.y-ht*.62,.7);windowAt(p.x+w*.39,p.y-ht*.62,.7)}
@@ -505,6 +548,8 @@ function draw(){let W=canvas.clientWidth,H=canvas.clientHeight;if(!W||!H)return;
  }
  drawPaths();
  drawLandscaping();
+ // v2.5: subtle neighborhood street details follow the road layout.
+ drawStreetDetails();
  s.placed.slice().sort((a,b)=>(a.x+a.y)-(b.x+b.y)).forEach(b=>{
   drawBuilding(b);
   if(isBuildingUnderConstruction(b)){

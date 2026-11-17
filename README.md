@@ -1,1 +1,1 @@
-Our Springfield v2.4: Smooth neighborhood walking loops, animated footsteps and arms, offscreen character culling. Upload index.html to GitHub Pages. Existing local progress preserved.
+Our Springfield v2.5 — visual details update. Extract and replace index.html in your GitHub Pages repository. Adds varied civic, storefront and industrial roof details, plus intersection markings. Preserves local saves, controls and progression.
