@@ -2,7 +2,7 @@
 <html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#f38db8"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="default">
-<link rel="manifest" href="manifest.webmanifest"><title>Our Springfield v1.5</title>
+<link rel="manifest" href="manifest.webmanifest"><title>Our Springfield v1.7</title>
 <style>
 :root{--pink:#f38db8;--plum:#76445f;--cream:#fff8ed;--ink:#382c36}
 *{box-sizing:border-box}body{margin:0;background:#d7e9ee;color:var(--ink);font-family:system-ui,-apple-system,sans-serif;overflow:hidden;height:100dvh}
@@ -128,7 +128,7 @@ nav{position:fixed;bottom:0;left:0;right:0;background:#fff9f1;border-top:1px sol
 <div class="economy-hud"><div class="hud-pill">💵 CASH&nbsp; ∞</div><div class="hud-pill">🍩 DONUTS&nbsp; ∞</div></div>
 <div class="level-hud"><div class="level-line"><span id="hudLevel">LEVEL 1</span><span id="hudXpText">0 / 100 XP</span></div><div class="xp-track"><i id="hudXpBar"></i></div></div>
 <button class="taskbook-button" onclick="openTaskBook()" aria-label="Open task book">📖<em id="taskBadge">!</em></button>
-<div class="action-dock"><button onclick="openPanel('build')" aria-label="Build">🏗️</button><button onclick="openPanel('residents')" aria-label="Characters">👥</button><button onclick="openPanel('income')" aria-label="Town management">🔨</button></div>
+<div class="action-dock"><button onclick="openLandMenu()" aria-label="Expand land">🗺️</button><button onclick="openPanel('build')" aria-label="Build">🏗️</button><button onclick="openPanel('residents')" aria-label="Characters">👥</button><button onclick="openPanel('income')" aria-label="Town management">🔨</button></div>
 <div class="menu-shade" id="taskShade" onclick="closeTaskBook()"><div class="taskbook-sheet" onclick="event.stopPropagation()"><button class="taskbook-close" onclick="closeTaskBook()">✕</button><h2>📖 Tasks & Quests</h2><button class="new-game-menu" onclick="newGame()">🔄 New Game (start from beginning)</button><div id="taskBookContent"></div></div></div>
 <nav><button onclick="closePanel()"><span>🏡</span>Town</button><button onclick="openPanel('build')"><span>🏗️</span>Build</button><button onclick="openPanel('residents')"><span>🧍</span>Residents</button><button onclick="openPanel('income')"><span>💰</span>Income</button><button onclick="openPanel('friends')"><span>👥</span>Friends</button></nav>
 
@@ -149,9 +149,105 @@ const items=[
 {name:'Little Park',income:8,interval:60000,cat:'Decor',emoji:'🌳',level:1,w:1,h:1,color:'#83b96c'},
 {name:'Flower Garden',income:10,interval:60000,cat:'Decor',emoji:'🌷',level:3,w:1,h:1,color:'#a4c978'},
 {name:'Town Fountain',income:15,interval:90000,cat:'Decor',emoji:'⛲',level:5,w:1,h:1,color:'#91d3dc'},
-{name:'Forest Camp',income:80,interval:240000,cat:'Special',emoji:'🏕️',level:8,w:3,h:2,color:'#a9c18a'}
+{name:'Forest Camp',income:80,interval:240000,cat:'Special',emoji:'🏕️',level:8,w:3,h:2,color:'#a9c18a'},
+{name:'Sunset Bungalow',income:25,interval:60000,cat:'Homes',emoji:'🏠',level:3,w:2,h:2,color:'#f0b58d'},
+{name:'Bluebird House',income:37,interval:60000,cat:'Homes',emoji:'🏡',level:4,w:2,h:2,color:'#f0b58d'},
+{name:'Duplex',income:59,interval:120000,cat:'Homes',emoji:'🏘️',level:7,w:2,h:2,color:'#f0b58d'},
+{name:'Riverside Villa',income:76,interval:120000,cat:'Homes',emoji:'🏠',level:9,w:2,h:2,color:'#f0b58d'},
+{name:'Townhouses',income:98,interval:180000,cat:'Homes',emoji:'🏘️',level:12,w:2,h:2,color:'#f0b58d'},
+{name:'Brick Apartments',income:120,interval:180000,cat:'Homes',emoji:'🏢',level:15,w:2,h:2,color:'#f0b58d'},
+{name:'Modern Condos',income:147,interval:240000,cat:'Homes',emoji:'🏙️',level:19,w:3,h:2,color:'#f0b58d'},
+{name:'Hilltop Mansion',income:179,interval:300000,cat:'Homes',emoji:'🏰',level:24,w:3,h:2,color:'#f0b58d'},
+{name:'Garden Estate',income:216,interval:360000,cat:'Homes',emoji:'🏡',level:30,w:3,h:2,color:'#f0b58d'},
+{name:'Luxury Towers',income:263,interval:420000,cat:'Homes',emoji:'🏙️',level:38,w:3,h:2,color:'#f0b58d'},
+{name:'Bakery',income:25,interval:60000,cat:'Shops',emoji:'🥐',level:3,w:2,h:2,color:'#e6a66f'},
+{name:'Book Shop',income:42,interval:60000,cat:'Shops',emoji:'📚',level:5,w:2,h:2,color:'#e6a66f'},
+{name:'Toy Store',income:59,interval:120000,cat:'Shops',emoji:'🧸',level:7,w:2,h:2,color:'#e6a66f'},
+{name:'Ice Cream Shop',income:71,interval:120000,cat:'Shops',emoji:'🍦',level:8,w:2,h:2,color:'#e6a66f'},
+{name:'Movie Theater',income:88,interval:120000,cat:'Shops',emoji:'🎬',level:10,w:2,h:2,color:'#e6a66f'},
+{name:'Arcade',income:105,interval:180000,cat:'Shops',emoji:'🕹️',level:12,w:2,h:2,color:'#e6a66f'},
+{name:'Supermarket',income:122,interval:180000,cat:'Shops',emoji:'🛒',level:14,w:2,h:2,color:'#e6a66f'},
+{name:'Hardware Store',income:139,interval:180000,cat:'Shops',emoji:'🛠️',level:16,w:2,h:2,color:'#e6a66f'},
+{name:'Department Store',income:171,interval:240000,cat:'Shops',emoji:'🏬',level:21,w:3,h:2,color:'#e6a66f'},
+{name:'Bowling Alley',income:198,interval:300000,cat:'Shops',emoji:'🎳',level:25,w:3,h:2,color:'#e6a66f'},
+{name:'Shopping Plaza',income:240,interval:360000,cat:'Shops',emoji:'🛍️',level:32,w:3,h:2,color:'#e6a66f'},
+{name:'Fire Station',income:50,interval:120000,cat:'Civic',emoji:'🚒',level:8,w:2,h:2,color:'#d8d0a2'},
+{name:'Police Station',income:67,interval:120000,cat:'Civic',emoji:'🚓',level:10,w:2,h:2,color:'#d8d0a2'},
+{name:'Town Library',income:84,interval:180000,cat:'Civic',emoji:'📖',level:12,w:2,h:2,color:'#d8d0a2'},
+{name:'Post Office',income:101,interval:180000,cat:'Civic',emoji:'📮',level:14,w:2,h:2,color:'#d8d0a2'},
+{name:'City Hall',income:118,interval:180000,cat:'Civic',emoji:'🏛️',level:16,w:2,h:2,color:'#d8d0a2'},
+{name:'Museum',income:145,interval:240000,cat:'Civic',emoji:'🏛️',level:20,w:3,h:2,color:'#d8d0a2'},
+{name:'Courthouse',income:172,interval:300000,cat:'Civic',emoji:'⚖️',level:24,w:3,h:2,color:'#d8d0a2'},
+{name:'University',income:209,interval:360000,cat:'Civic',emoji:'🎓',level:30,w:3,h:2,color:'#d8d0a2'},
+{name:'Train Station',income:246,interval:420000,cat:'Civic',emoji:'🚉',level:36,w:3,h:2,color:'#d8d0a2'},
+{name:'Power Substation',income:50,interval:120000,cat:'Industry',emoji:'⚡',level:8,w:3,h:2,color:'#b4c3c8'},
+{name:'Warehouse',income:72,interval:120000,cat:'Industry',emoji:'🏭',level:11,w:3,h:2,color:'#b4c3c8'},
+{name:'Recycling Center',income:89,interval:180000,cat:'Industry',emoji:'♻️',level:13,w:3,h:2,color:'#b4c3c8'},
+{name:'Water Works',income:111,interval:180000,cat:'Industry',emoji:'💧',level:16,w:3,h:2,color:'#b4c3c8'},
+{name:'Delivery Depot',income:128,interval:240000,cat:'Industry',emoji:'🚚',level:18,w:3,h:2,color:'#b4c3c8'},
+{name:'Wind Farm',income:155,interval:240000,cat:'Industry',emoji:'🌬️',level:22,w:3,h:2,color:'#b4c3c8'},
+{name:'Research Lab',income:192,interval:300000,cat:'Industry',emoji:'🔬',level:28,w:3,h:2,color:'#b4c3c8'},
+{name:'Solar Plant',income:229,interval:360000,cat:'Industry',emoji:'☀️',level:34,w:3,h:2,color:'#b4c3c8'},
+{name:'Playground',income:30,interval:60000,cat:'Entertainment',emoji:'🛝',level:4,w:3,h:2,color:'#d9a7cd'},
+{name:'Community Pool',income:62,interval:120000,cat:'Entertainment',emoji:'🏊',level:9,w:3,h:2,color:'#d9a7cd'},
+{name:'Skate Park',income:79,interval:120000,cat:'Entertainment',emoji:'🛹',level:11,w:3,h:2,color:'#d9a7cd'},
+{name:'Concert Stage',income:106,interval:180000,cat:'Entertainment',emoji:'🎤',level:15,w:3,h:2,color:'#d9a7cd'},
+{name:'Sports Stadium',income:148,interval:240000,cat:'Entertainment',emoji:'🏟️',level:22,w:3,h:2,color:'#d9a7cd'},
+{name:'Fairground',income:175,interval:300000,cat:'Entertainment',emoji:'🎡',level:26,w:3,h:2,color:'#d9a7cd'},
+{name:'Aquarium',income:217,interval:360000,cat:'Entertainment',emoji:'🐠',level:33,w:3,h:2,color:'#d9a7cd'},
+{name:'Theme Park',income:259,interval:420000,cat:'Entertainment',emoji:'🎢',level:40,w:3,h:2,color:'#d9a7cd'},
+{name:'Fishing Pier',income:70,interval:180000,cat:'Waterfront',emoji:'🎣',level:12,w:2,h:2,color:'#8cbec9'},
+{name:'Boathouse',income:87,interval:180000,cat:'Waterfront',emoji:'🛶',level:14,w:2,h:2,color:'#8cbec9'},
+{name:'Beach Hut',income:104,interval:180000,cat:'Waterfront',emoji:'🏖️',level:16,w:2,h:2,color:'#8cbec9'},
+{name:'Lighthouse',income:131,interval:240000,cat:'Waterfront',emoji:'🗼',level:20,w:3,h:2,color:'#8cbec9'},
+{name:'Marina',income:163,interval:300000,cat:'Waterfront',emoji:'⛵',level:25,w:3,h:2,color:'#8cbec9'},
+{name:'Boardwalk Shops',income:190,interval:300000,cat:'Waterfront',emoji:'🛍️',level:29,w:3,h:2,color:'#8cbec9'},
+{name:'Harbor Hotel',income:232,interval:420000,cat:'Waterfront',emoji:'🏨',level:36,w:3,h:2,color:'#8cbec9'},
+{name:'Pine Grove',income:35,interval:60000,cat:'Nature',emoji:'🌲',level:5,w:1,h:1,color:'#81bb7d'},
+{name:'Picnic Meadow',income:52,interval:120000,cat:'Nature',emoji:'🧺',level:7,w:1,h:1,color:'#81bb7d'},
+{name:'Hiking Trail',income:74,interval:120000,cat:'Nature',emoji:'🥾',level:10,w:2,h:2,color:'#81bb7d'},
+{name:'Ranger Cabin',income:96,interval:180000,cat:'Nature',emoji:'🛖',level:13,w:1,h:1,color:'#81bb7d'},
+{name:'Campground',income:123,interval:180000,cat:'Nature',emoji:'🏕️',level:17,w:2,h:2,color:'#81bb7d'},
+{name:'Botanical Gardens',income:150,interval:240000,cat:'Nature',emoji:'🌺',level:21,w:3,h:2,color:'#81bb7d'},
+{name:'Nature Preserve',income:187,interval:300000,cat:'Nature',emoji:'🦌',level:27,w:3,h:2,color:'#81bb7d'},
+{name:'Oak Tree',income:20,interval:60000,cat:'Decor',emoji:'🌳',level:2,w:1,h:1,color:'#8ac76b'},
+{name:'Pine Tree',income:27,interval:60000,cat:'Decor',emoji:'🌲',level:2,w:1,h:1,color:'#8ac76b'},
+{name:'Hedge',income:39,interval:60000,cat:'Decor',emoji:'🌿',level:3,w:1,h:1,color:'#8ac76b'},
+{name:'Flower Bed',income:46,interval:60000,cat:'Decor',emoji:'🌸',level:3,w:1,h:1,color:'#8ac76b'},
+{name:'Park Bench',income:58,interval:60000,cat:'Decor',emoji:'🪑',level:4,w:1,h:1,color:'#8ac76b'},
+{name:'Street Lamp',income:65,interval:60000,cat:'Decor',emoji:'💡',level:4,w:1,h:1,color:'#8ac76b'},
+{name:'Mailbox',income:77,interval:60000,cat:'Decor',emoji:'📬',level:5,w:1,h:1,color:'#8ac76b'},
+{name:'Picnic Table',income:84,interval:60000,cat:'Decor',emoji:'🧺',level:5,w:1,h:1,color:'#8ac76b'},
+{name:'Garden Gnome',income:96,interval:120000,cat:'Decor',emoji:'🍄',level:6,w:1,h:1,color:'#8ac76b'},
+{name:'Statue',income:118,interval:120000,cat:'Decor',emoji:'🗿',level:9,w:1,h:1,color:'#8ac76b'},
+{name:'Gazebo',income:140,interval:180000,cat:'Decor',emoji:'🏕️',level:12,w:1,h:1,color:'#8ac76b'},
+{name:'Clock Tower',income:177,interval:240000,cat:'Decor',emoji:'🕰️',level:18,w:1,h:1,color:'#8ac76b'},
+{name:'Stone Arch',income:209,interval:240000,cat:'Decor',emoji:'🏛️',level:23,w:1,h:1,color:'#8ac76b'},
+{name:'Topiary',income:246,interval:300000,cat:'Decor',emoji:'🌳',level:29,w:1,h:1,color:'#8ac76b'},
+{name:'Observatory',income:100,interval:240000,cat:'Special',emoji:'🔭',level:18,w:3,h:2,color:'#dbb78b'},
+{name:'Film Studio',income:137,interval:300000,cat:'Special',emoji:'🎥',level:24,w:3,h:2,color:'#dbb78b'},
+{name:'Skyline Hotel',income:184,interval:360000,cat:'Special',emoji:'🏨',level:32,w:3,h:2,color:'#dbb78b'},
+{name:'Science Dome',income:221,interval:420000,cat:'Special',emoji:'🪐',level:38,w:3,h:2,color:'#dbb78b'},
+{name:'Grand Landmark',income:263,interval:480000,cat:'Special',emoji:'🏰',level:45,w:3,h:2,color:'#dbb78b'},
+{name:'Pumpkin Patch',income:40,interval:180000,cat:'Events',emoji:'🎃',level:5,w:2,h:2,color:'#b8d7ad',event:'Halloween'},
+{name:'Haunted Cottage',income:80,interval:180000,cat:'Events',emoji:'👻',level:10,w:2,h:2,color:'#b8d7ad',event:'Halloween'},
+{name:'Spooky Graveyard',income:120,interval:180000,cat:'Events',emoji:'🪦',level:15,w:2,h:2,color:'#b8d7ad',event:'Halloween'},
+{name:'Moonlit Manor',income:200,interval:180000,cat:'Events',emoji:'🏚️',level:25,w:2,h:2,color:'#b8d7ad',event:'Halloween'},
+{name:'Snowman Square',income:40,interval:180000,cat:'Events',emoji:'⛄',level:5,w:2,h:2,color:'#b8d7ad',event:'Winterfest'},
+{name:'Holiday Market',income:80,interval:180000,cat:'Events',emoji:'🎄',level:10,w:2,h:2,color:'#b8d7ad',event:'Winterfest'},
+{name:'Ice Rink',income:128,interval:180000,cat:'Events',emoji:'⛸️',level:16,w:2,h:2,color:'#b8d7ad',event:'Winterfest'},
+{name:'Winter Palace',income:208,interval:180000,cat:'Events',emoji:'🏰',level:26,w:2,h:2,color:'#b8d7ad',event:'Winterfest'},
+{name:'Heart Garden',income:40,interval:180000,cat:'Events',emoji:'💝',level:5,w:2,h:2,color:'#b8d7ad',event:'Valentines'},
+{name:'Sweetheart Cafe',income:80,interval:180000,cat:'Events',emoji:'💗',level:10,w:2,h:2,color:'#b8d7ad',event:'Valentines'},
+{name:'Rose Pavilion',income:144,interval:180000,cat:'Events',emoji:'🌹',level:18,w:2,h:2,color:'#b8d7ad',event:'Valentines'},
+{name:'Egg Hunt Park',income:40,interval:180000,cat:'Events',emoji:'🥚',level:5,w:2,h:2,color:'#b8d7ad',event:'Spring Fair'},
+{name:'Spring Greenhouse',income:96,interval:180000,cat:'Events',emoji:'🌷',level:12,w:2,h:2,color:'#b8d7ad',event:'Spring Fair'},
+{name:'Flower Festival',income:160,interval:180000,cat:'Events',emoji:'💐',level:20,w:2,h:2,color:'#b8d7ad',event:'Spring Fair'},
+{name:'Summer Beach',income:48,interval:180000,cat:'Events',emoji:'🏖️',level:6,w:2,h:2,color:'#b8d7ad',event:'Summer'},
+{name:'Fireworks Stage',income:112,interval:180000,cat:'Events',emoji:'🎆',level:14,w:2,h:2,color:'#b8d7ad',event:'Summer'},
+{name:'Water Park',income:192,interval:180000,cat:'Events',emoji:'🌊',level:24,w:2,h:2,color:'#b8d7ad',event:'Summer'}
 ];
-const chars=[{name:'Mayor Maple',emoji:'🧑‍💼',level:1},{name:'Riley',emoji:'🧑',level:1},{name:'Casey',emoji:'👩',level:3},{name:'Coach Cedar',emoji:'🧔',level:6}];
+const chars=[{name:'Mayor Maple',emoji:'🧑‍💼',level:1},{name:'Riley',emoji:'🧑',level:1},{name:'Casey',emoji:'👩',level:3},{name:'Coach Cedar',emoji:'🧔',level:6},{name:'Dr. Willow',emoji:'👩‍⚕️',level:8},{name:'Officer Brook',emoji:'👮',level:10},{name:'Chef Olive',emoji:'👩‍🍳',level:12},{name:'Professor Finch',emoji:'👨‍🏫',level:16},{name:'Captain Reed',emoji:'🧑‍✈️',level:20},{name:'Artist June',emoji:'👩‍🎨',level:25},{name:'Inventor Pip',emoji:'🧑‍🔬',level:30},{name:'Ranger Moss',emoji:'🧑‍🌾',level:36}];
 // One-time forced new-game migration for v1.5: reset even if the v1.3 marker was already set.
 // The migration flag prevents clearing progress again on future launches.
 const RESET_FLAG='os_fresh_start_v15';
@@ -172,14 +268,25 @@ const STORY=[
 if(s.storyStage===undefined){s.storyStage=s.placed.length?STORY.length-1:0;s.storySeen=!!s.placed.length;}
 function activeStory(){return STORY[Math.min(s.storyStage,STORY.length-1)]}
 function isCharacterUnlocked(c){return c.level<=s.level&&(c.name!=='Riley'||s.storyStage>=1)}
-function canBuild(b){return b.level<=s.level&&(s.storyStage>=STORY.length-1||s.storyStage>=4||b.name==='Starter Cottage'&&s.storyStage===0||b.name==='Little Park'&&s.storyStage>=2)}
+function canBuild(b){return (!b.event||s.activeEvent===b.event)&&b.level<=s.level&&(s.storyStage>=STORY.length-1||s.storyStage>=4||b.name==='Starter Cottage'&&s.storyStage===0||b.name==='Little Park'&&s.storyStage>=2)}
 function storyModal(){let q=activeStory();document.getElementById('storyFace').textContent=q.face;document.getElementById('storyTitle').textContent=q.title;document.getElementById('storyText').textContent=q.speaker+': “'+q.dialogue+'”\n\nMission: '+q.objective;document.getElementById('storyButton').textContent=s.storyStage===0?'Start rebuilding':'Continue';document.getElementById('storyShade').classList.add('open');s.storySeen=true;save()}
 function closeStory(){document.getElementById('storyShade').classList.remove('open');if(s.storyStage===0){openPanel('build')}else if(s.storyStage===1){openCharacter('Riley')}else if(s.storyStage===2||s.storyStage===4||s.storyStage===5){openPanel('build')}else if(s.storyStage===3){openPanel('income')}}
 function storyComplete(type,target){let q=activeStory();if(q.type!==type||(q.target&&q.target!==target))return;s.xp+=q.reward;s.storyStage=Math.min(s.storyStage+1,STORY.length-1);s.storySeen=true;refresh();setTimeout(storyModal,250)}
 function newGame(){if(!confirm('Start a brand-new town? This deletes your saved town, buildings, XP, and tasks on this device.'))return;localStorage.removeItem('os_iso_save');location.reload()}
 
 s.placed.forEach(b=>{if(!b.lastCollected)b.lastCollected=Date.now();if(!b.rotation)b.rotation=0});if(!s.tasks||Array.isArray(s.tasks))s.tasks={};
-let cat='All',chosen=null,scale=1,ox=0,oy=30,drag=null,lastTap=0,moveMode=false,selectedBuilding=-1,rotateNext=false;
+const LAND_GRID=36, PLOT=4, PLOTS_PER_SIDE=LAND_GRID/PLOT;
+if(!Array.isArray(s.landPlots)){s.landPlots=[];for(let py=3;py<6;py++)for(let px=3;px<6;px++)s.landPlots.push(px+','+py);}
+function plotId(px,py){return Math.floor(px/PLOT)+','+Math.floor(py/PLOT)}
+function landOwned(x,y){return x>=0&&y>=0&&x<LAND_GRID&&y<LAND_GRID&&s.landPlots.includes(plotId(x,y))}
+function footprintOwned(x,y,w,h){return landOwned(x,y)&&landOwned(x+w-1,y)&&landOwned(x,y+h-1)&&landOwned(x+w-1,y+h-1)}
+function landAdjacent(px,py){return [[px-1,py],[px+1,py],[px,py-1],[px,py+1]].some(([a,b])=>s.landPlots.includes(a+','+b))}
+s.placed.forEach(b=>{if(b.x>=0&&b.y>=0&&b.x<LAND_GRID&&b.y<LAND_GRID){let id=plotId(b.x,b.y);if(!s.landPlots.includes(id))s.landPlots.push(id)}});
+function plotCost(px,py){let distance=Math.max(Math.abs(px-4),Math.abs(py-4));return {cash:Math.round(1000*Math.pow(2,distance)+s.landPlots.length*350),donuts:Math.max(5,distance*5+Math.floor(s.landPlots.length/5))}}
+function purchasablePlots(){let out=[];for(let y=0;y<PLOTS_PER_SIDE;y++)for(let x=0;x<PLOTS_PER_SIDE;x++){let id=x+','+y;if(!s.landPlots.includes(id)&&landAdjacent(x,y))out.push({x,y,id,...plotCost(x,y)})}return out}
+function buyLand(id,method){let p=purchasablePlots().find(q=>q.id===id);if(!p)return alert('Unlock a neighboring plot first.');if(!confirm('Expand into this 4 × 4 plot for '+(method==='donuts'?p.donuts+' donuts':'$'+p.cash.toLocaleString())+'? Your balance is unlimited.'))return;s.landPlots.push(id);s.xp+=30;save();refresh();requestDraw();openLandMenu()}
+function openLandMenu(){const shade=document.getElementById('menuShade'),content=document.getElementById('sheetContent');document.getElementById('sheetTitle').textContent='🗺️ Land Expansion';const plots=purchasablePlots();content.innerHTML='<p class="notice">Your town starts with 9 plots. Expand one adjacent 4 × 4 plot at a time. Cash and donuts are unlimited, but new land must still be purchased in order. '+s.landPlots.length+' of '+(PLOTS_PER_SIDE*PLOTS_PER_SIDE)+' plots owned.</p>'+ (plots.length?plots.map(p=>'<div class="task"><div><b>Plot '+(p.x+1)+'-'+(p.y+1)+'</b><div class="subtle">16 new tiles · $'+p.cash.toLocaleString()+' or '+p.donuts+' donuts</div></div><div class="mini-actions"><button onclick="buyLand(\''+p.id+'\',\'cash\')">💵 Buy</button><button onclick="buyLand(\''+p.id+'\',\'donuts\')">🍩 Buy</button></div></div>').join(''):'<p>All land plots unlocked!</p>');shade.classList.add('open')}
+let cat='All',chosen=null,scale=1,ox=0,oy=-440,drag=null,lastTap=0,moveMode=false,selectedBuilding=-1,rotateNext=false;
 function save(){localStorage.setItem('os_iso_save',JSON.stringify(s))}
 function resize(){let r=canvas.getBoundingClientRect(),dpr=Math.min(devicePixelRatio||1,1.5);canvas.width=Math.round(r.width*dpr);canvas.height=Math.round(r.height*dpr);ctx.setTransform(dpr,0,0,dpr,0,0);backgroundKey='';backgroundCanvas=null;requestDraw()}
 function iso(x,y){return {x:(x-y)*TW/2,y:(x+y)*TH/2}}
@@ -194,7 +301,7 @@ function drawBuilding(b){
  const p=project(b.x+bw/2,b.y+bh/2),a=scale;
  const w=(bw+bh)*TW/4*a,h=(bw+bh)*TH/4*a,ht=(b.cat==='Civic'?55:b.cat==='Shops'?45:39)*a;
  const ink='#43342c',left=b.color||'#f0c786',right=shade(left);
- const park=b.cat==='Decor'||b.name==='Forest Camp';
+ const park=['Decor','Nature'].includes(b.cat)||b.name==='Forest Camp'||(b.cat==='Events'&&['Pumpkin Patch','Spooky Graveyard','Snowman Square','Heart Garden','Egg Hunt Park','Summer Beach'].includes(b.name));
  ctx.save();ctx.lineJoin='round';ctx.lineCap='round';
  ctx.fillStyle='#32582d55';ctx.beginPath();ctx.ellipse(p.x,p.y+12*a,w*.72,h*.8,0,0,7);ctx.fill();
  if(park){
@@ -237,7 +344,7 @@ function drawBuilding(b){
 function ySafe(v){return v}
 function shade(hex){const m=/^#([0-9a-f]{6})$/i.exec(hex||'');if(!m)return '#c88e6c';let n=parseInt(m[1],16),r=Math.max(0,((n>>16)&255)-38),g=Math.max(0,((n>>8)&255)-38),b=Math.max(0,(n&255)-38);return '#'+[r,g,b].map(v=>v.toString(16).padStart(2,'0')).join('')}
 let backgroundCanvas=null,backgroundKey='';
-const BG_W=1900,BG_H=1150,BG_X=900,BG_Y=120;
+const BG_W=2900,BG_H=1500,BG_X=1450,BG_Y=70;
 let drawQueued=false;
 function requestDraw(){if(drawQueued)return;drawQueued=true;requestAnimationFrame(()=>{drawQueued=false;draw()})}
 function clampZoom(z){return Math.max(.42,Math.min(2.25,z))}
@@ -250,15 +357,15 @@ function drawBackground(){if(backgroundCanvas)return backgroundCanvas;
  const oldScale=scale,oldOx=ox,oldOy=oy;
  scale=1;ox=BG_X-canvas.clientWidth/2;oy=BG_Y-canvas.clientHeight*.42;
  // grass lots with subtle hand-drawn texture
- for(let y=0;y<20;y++)for(let x=0;x<24;x++){let p=project(x,y),j=((x*17+y*11)%7);bg.beginPath();bg.moveTo(p.x,p.y);bg.lineTo(p.x+TW/2*scale,p.y+TH/2*scale);bg.lineTo(p.x,p.y+TH*scale);bg.lineTo(p.x-TW/2*scale,p.y+TH/2*scale);bg.closePath();bg.fillStyle=j===0?'#8bd36a':j===1?'#7fc75a':'#86cd62';bg.fill();bg.strokeStyle='#75b653';bg.lineWidth=.65;bg.stroke();}
+ for(let y=0;y<LAND_GRID;y++)for(let x=0;x<LAND_GRID;x++){let p=project(x,y),j=((x*17+y*11)%7);bg.beginPath();bg.moveTo(p.x,p.y);bg.lineTo(p.x+TW/2*scale,p.y+TH/2*scale);bg.lineTo(p.x,p.y+TH*scale);bg.lineTo(p.x-TW/2*scale,p.y+TH/2*scale);bg.closePath();bg.fillStyle=j===0?'#8bd36a':j===1?'#7fc75a':'#86cd62';bg.fill();bg.strokeStyle='#75b653';bg.lineWidth=.65;bg.stroke();}
  // diagonal suburban road with pale sidewalks, curb and asphalt
  const roadTiles=[[0,8],[1,8],[2,8],[3,8],[4,8],[5,8],[6,8],[7,8],[8,8],[9,8],[10,8],[11,8],[12,8],[13,8],[14,8],[15,8],[16,8],[17,8],[18,8],[19,8],[10,7],[10,6],[10,5],[10,4],[10,3]];
  roadTiles.forEach(([x,y])=>{let p=project(x,y),pts=[{x:p.x,y:p.y},{x:p.x+TW/2*scale,y:p.y+TH/2*scale},{x:p.x,y:p.y+TH*scale},{x:p.x-TW/2*scale,y:p.y+TH/2*scale}];bg.beginPath();pts.forEach((q,i)=>i?bg.lineTo(q.x,q.y):bg.moveTo(q.x,q.y));bg.closePath();bg.fillStyle='#d8d4ca';bg.fill();bg.strokeStyle='#aaa69c';bg.lineWidth=1;bg.stroke();
  let inset=5*scale;bg.beginPath();bg.moveTo(p.x,p.y+inset);bg.lineTo(p.x+TW/2*scale,p.y+TH/2*scale);bg.lineTo(p.x,p.y+TH*scale-inset);bg.lineTo(p.x-TW/2*scale,p.y+TH/2*scale);bg.closePath();bg.fillStyle='#888b89';bg.fill();bg.strokeStyle='#f0eee8';bg.lineWidth=1;bg.stroke();});
  // fences and planted trees around the neighborhood
- for(let i=0;i<13;i++){let x=(i*5+2)%22,y=(i*7+2)%16;if((x>8&&x<13)||(y===8))continue;drawTree(bg,x,y,0.8+(i%3)*.12)}
+ for(let i=0;i<34;i++){let x=(i*5+2)%LAND_GRID,y=(i*7+2)%LAND_GRID;if((x>8&&x<13)||(y===8))continue;drawTree(bg,x,y,0.8+(i%3)*.12)}
  // flower dots and shrubs
- for(let i=0;i<26;i++){let x=(i*7+3)%22,y=(i*11+4)%17;if(y===8||x===10)continue;let p=project(x+.35,y+.35);bg.fillStyle=i%3===0?'#fff1a5':i%3===1?'#f3a6c2':'#fff';bg.beginPath();bg.arc(p.x,p.y,1.5*scale,0,Math.PI*2);bg.fill()}
+ for(let i=0;i<55;i++){let x=(i*7+3)%LAND_GRID,y=(i*11+4)%LAND_GRID;if(y===8||x===10)continue;let p=project(x+.35,y+.35);bg.fillStyle=i%3===0?'#fff1a5':i%3===1?'#f3a6c2':'#fff';bg.beginPath();bg.arc(p.x,p.y,1.5*scale,0,Math.PI*2);bg.fill()}
  scale=oldScale;ox=oldOx;oy=oldOy;return backgroundCanvas;
 }
 
@@ -291,6 +398,14 @@ function drawResident(c,x,y,index){
 }
 
 function draw(){let W=canvas.clientWidth,H=canvas.clientHeight;if(!W||!H)return;ctx.fillStyle='#83c95d';ctx.fillRect(0,0,W,H);ctx.drawImage(drawBackground(),W/2+ox-BG_X*scale,H*.42+oy-BG_Y*scale,BG_W*scale,BG_H*scale);
+ // Dim unowned land and mark the frontier with clear purchasable plots.
+ for(let py=0;py<PLOTS_PER_SIDE;py++)for(let px=0;px<PLOTS_PER_SIDE;px++){
+  if(s.landPlots.includes(px+','+py))continue;
+  const corners=[[px*PLOT,py*PLOT],[(px+1)*PLOT,py*PLOT],[(px+1)*PLOT,(py+1)*PLOT],[px*PLOT,(py+1)*PLOT]].map(([x,y])=>project(x,y));
+  ctx.beginPath();corners.forEach((p,i)=>i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y));ctx.closePath();
+  const frontier=landAdjacent(px,py);ctx.fillStyle=frontier?'#5a739466':'#2a4b3866';ctx.fill();ctx.strokeStyle=frontier?'#ffe87a':'#496b4b';ctx.lineWidth=frontier?2:1;ctx.stroke();
+  if(frontier&&scale>.58){const p=project(px*PLOT+2,py*PLOT+2);ctx.font=`bold ${Math.max(10,13*scale)}px system-ui`;ctx.textAlign='center';ctx.fillStyle='#fff4c5';ctx.strokeStyle='#3b4d36';ctx.lineWidth=3;ctx.strokeText('＋',p.x,p.y);ctx.fillText('＋',p.x,p.y)}
+ }
  s.placed.slice().sort((a,b)=>(a.x+a.y)-(b.x+b.y)).forEach(drawBuilding);
  // Original hand-drawn cartoon residents, rendered at readable size in the actual town.
  const now=Date.now();
@@ -317,7 +432,7 @@ function draw(){let W=canvas.clientWidth,H=canvas.clientHeight;if(!W||!H)return;
 }
 let visibleResidents=[];
 function hitResident(px,py){for(let i=visibleResidents.length-1;i>=0;i--){let c=visibleResidents[i];if(Math.hypot(px-c.x,py-c.y)<c.r)return c.name}return null}
-function hitTile(px,py){let best=null,dist=1e9;for(let y=0;y<18;y++)for(let x=0;x<22;x++){let p=project(x+.5,y+.5),d=Math.hypot((px-p.x)/scale,(py-p.y)/scale);if(d<dist){dist=d;best={x,y}}}return dist<Math.max(24,Math.min(42,TH*1.15*scale))?best:null}
+function hitTile(px,py){let best=null,dist=1e9;for(let y=0;y<LAND_GRID;y++)for(let x=0;x<LAND_GRID;x++){let p=project(x+.5,y+.5),d=Math.hypot((px-p.x)/scale,(py-p.y)/scale);if(d<dist){dist=d;best={x,y}}}return dist<Math.max(24,Math.min(42,TH*1.15*scale))?best:null}
 // Pointer gestures: single-finger pan/tap, two-finger pinch around the midpoint.
 const pointers=new Map();
 let startPt=null,lastPointer=null,isPanning=false,gestureUsed=false,pinchDistance=0;
@@ -352,12 +467,13 @@ function finishPointer(e,cancelled=false){
  if(pointers.size===0){lastPointer=null;isPanning=false;pinchDistance=0}
  if(cancelled||!wasSingle||wasPan||wasGesture){if(!pointers.size)startPt=null;return}
  const r=canvas.getBoundingClientRect(),px=e.clientX-r.left,py=e.clientY-r.top;
- if(moveMode&&selectedBuilding>=0){let t=hitTile(px,py);if(t){let b=s.placed[selectedBuilding],bw=b.rotation%2?b.h:b.w,bh=b.rotation%2?b.w:b.h;if(!occupied(t.x,t.y,bw,bh,selectedBuilding)){b.x=t.x;b.y=t.y;save();moveMode=false;selectedBuilding=-1;chosen=null;refresh();requestDraw()}else alert('That space is occupied.')}startPt=null;return}
+ if(moveMode&&selectedBuilding>=0){let t=hitTile(px,py);if(t){let b=s.placed[selectedBuilding],bw=b.rotation%2?b.h:b.w,bh=b.rotation%2?b.w:b.h;if(!footprintOwned(t.x,t.y,bw,bh)){alert('Buy this land before moving here.');startPt=null;return}if(!occupied(t.x,t.y,bw,bh,selectedBuilding)){b.x=t.x;b.y=t.y;save();moveMode=false;selectedBuilding=-1;chosen=null;refresh();requestDraw()}else alert('That space is occupied.')}startPt=null;return}
  if(!window.pendingBuild){const resident=hitResident(px,py);if(resident){openCharacter(resident);startPt=null;return}}
  let hit=-1;for(let i=s.placed.length-1;i>=0;i--){let b=s.placed[i],bw=b.rotation%2?b.h:b.w,bh=b.rotation%2?b.w:b.h,p=project(b.x+bw/2,b.y+bh/2);if(Math.hypot(px-p.x,py-(p.y-12*scale))<34*scale){hit=i;break}}
  if(hit>=0){selectedBuilding=hit;chosen={x:s.placed[hit].x,y:s.placed[hit].y};requestDraw();startPt=null;return}
  let t=hitTile(px,py);if(!t){chosen=null;requestDraw();startPt=null;return}
- if(window.pendingBuild){window.pendingBuild=null;placePending(t)}else{chosen=null;selectedBuilding=-1}
+ if(!landOwned(t.x,t.y)){if(landAdjacent(Math.floor(t.x/PLOT),Math.floor(t.y/PLOT)))openLandMenu();else alert('Expand into neighboring land first.');startPt=null;return}
+ if(window.pendingBuild){placePending(t)}else{chosen=null;selectedBuilding=-1}
  requestDraw();startPt=null;
 }
 canvas.addEventListener('pointerup',e=>finishPointer(e));
@@ -366,8 +482,8 @@ canvas.addEventListener('lostpointercapture',e=>finishPointer(e,true));
 canvas.addEventListener('contextmenu',e=>e.preventDefault());
 canvas.addEventListener('wheel',e=>{e.preventDefault();zoomAt(scale*Math.exp(-e.deltaY*.001),e.clientX,e.clientY)},{passive:false});
 function occupied(x,y,w,h,ignore=-1){return s.placed.some((p,i)=>{if(i===ignore)return false;let pw=p.rotation%2?p.h:p.w,ph=p.rotation%2?p.w:p.h;return x<p.x+pw&&x+w>p.x&&y<p.y+ph&&y+h>p.y})}
-function placePending(t){let b=window.pendingBuild,bw=rotateNext?b.h:b.w,bh=rotateNext?b.w:b.h;if(occupied(t.x,t.y,bw,bh)){alert('That space is occupied. Choose another spot.');return}s.placed.push({...b,x:t.x,y:t.y,rotation:rotateNext?1:0,lastCollected:Date.now()});rotateNext=false;s.xp+=25;s.quests=Math.min(3,s.quests+1);save();storyComplete('build',b.name);refresh();draw()}
-function buildMenu(){let cats=['All',...new Set(items.map(i=>i.cat))];let tabs=cats.map(c=>`<button class="${c===cat?'active':''}" onclick="cat='${c}';buildMenu()">${c}</button>`).join('');let arr=items.filter(i=>cat==='All'||i.cat===cat);let cards=arr.map(b=>`<div class="card ${!canBuild(b)?'locked':''}"><div class="emoji">${b.emoji}</div><div><b>${b.name}</b><small>${!canBuild(b)?(b.level>s.level?'Unlocks at level '+b.level:'Unlock through story'):'Free · Level '+b.level}</small></div><button ${!canBuild(b)?'disabled':''} onclick="selectBuild('${b.name}')">${!canBuild(b)?'Locked':'Place'}</button></div>`).join('');document.querySelectorAll('#tabs').forEach(el=>el.innerHTML=tabs);document.querySelectorAll('#catalog').forEach(el=>el.innerHTML=cards)}
+function placePending(t){let b=window.pendingBuild,bw=rotateNext?b.h:b.w,bh=rotateNext?b.w:b.h;if(!footprintOwned(t.x,t.y,bw,bh)){alert('This building needs more unlocked land. Expand your town first.');return}if(occupied(t.x,t.y,bw,bh)){alert('That space is occupied. Choose another spot.');return}window.pendingBuild=null;s.placed.push({...b,x:t.x,y:t.y,rotation:rotateNext?1:0,lastCollected:Date.now()});rotateNext=false;s.xp+=25;s.quests=Math.min(3,s.quests+1);save();storyComplete('build',b.name);refresh();draw()}
+function buildMenu(){let cats=['All',...new Set(items.map(i=>i.cat))];let tabs=cats.map(c=>`<button class="${c===cat?'active':''}" onclick="cat='${c}';buildMenu()">${c}</button>`).join('');let arr=items.filter(i=>cat==='All'||i.cat===cat);let cards=arr.map(b=>`<div class="card ${!canBuild(b)?'locked':''}"><div class="emoji">${b.emoji}</div><div><b>${b.name}</b><small>${!canBuild(b)?(b.event&&s.activeEvent!==b.event?'Activate '+b.event+' event':b.level>s.level?'Unlocks at level '+b.level:'Unlock through story'):'Free · Level '+b.level}</small></div><button ${!canBuild(b)?'disabled':''} onclick="selectBuild('${b.name}')">${!canBuild(b)?'Locked':'Place'}</button></div>`).join('');document.querySelectorAll('#tabs').forEach(el=>el.innerHTML=tabs+'<button onclick="openEvents()">🎉 Events</button>');document.querySelectorAll('#catalog').forEach(el=>el.innerHTML=cards)}
 function selectBuild(name){let b=items.find(x=>x.name===name);if(!b||!canBuild(b)){alert('Keep following the story to unlock this building.');return}window.pendingBuild=b;closePanel();alert('Tap an open spot on the town map to place '+name+'.')}
 function refresh(){document.getElementById('level').textContent='LEVEL '+s.level;while(s.xp>=s.level*100){s.xp-=s.level*100;s.level++}document.getElementById('xptext').textContent=s.xp+' / '+(s.level*100)+' XP';document.getElementById('xpbar').style.width=Math.min(100,s.xp/(s.level*100)*100)+'%';document.getElementById('hudLevel').textContent='LEVEL '+s.level;document.getElementById('hudXpText').textContent=s.xp+' / '+(s.level*100)+' XP';document.getElementById('hudXpBar').style.width=Math.min(100,s.xp/(s.level*100)*100)+'%';document.getElementById('taskBadge').textContent='!';document.getElementById('townName').textContent=s.town;document.getElementById('questCount').textContent='Chapter '+(s.storyStage+1);document.getElementById('quest').textContent=activeStory().objective;renderResidents();renderIncome();buildMenu();renderCharacterRail();save()}
 
@@ -378,7 +494,7 @@ function startTask(name,index){let c=chars.find(c=>c.name===name);if(!c||!isChar
 function collectTask(name){let t=s.tasks[name];if(!t||Date.now()<t.endsAt)return;s.xp+=t.xp;delete s.tasks[name];storyComplete('task',name);refresh();draw()}
 function renderIncome(){let now=Date.now();document.getElementById('income').innerHTML=s.placed.length?s.placed.map((b,i)=>{let elapsed=now-(b.lastCollected||now),ready=Math.floor(elapsed/(b.interval||60000)),amount=ready*(b.income||10);return `<div class="task"><div style="flex:1"><b>${b.emoji} ${b.name}</b><div class="subtle">${amount>0?'$'+amount+' ready to collect':'Next payout in '+fmt((b.interval||60000)-(elapsed%(b.interval||60000)))}</div></div><button onclick="collectIncome(${i})" ${amount<=0?'disabled style="opacity:.45"':''}>Collect</button></div>`}).join(''):'<p class="notice">Place buildings to start earning town income.</p>'}
 function collectIncome(i){let b=s.placed[i];if(!b)return;let now=Date.now(),n=Math.floor((now-(b.lastCollected||now))/(b.interval||60000));if(n<1)return;let earned=n*(b.income||10);b.lastCollected=(b.lastCollected||now)+n*(b.interval||60000);s.xp+=Math.max(1,Math.floor(earned/10));save();storyComplete('income');refresh();draw();alert('Collected $'+earned+' and earned XP!')}
-function rotateSelected(){if(selectedBuilding>=0){s.placed[selectedBuilding].rotation=(s.placed[selectedBuilding].rotation+1)%2;save();draw();refresh()}else if(window.pendingBuild){rotateNext=!rotateNext;alert('Next building placement: '+(rotateNext?'rotated':'normal orientation'))}else alert('Select a placed building or choose one from Build first.')}
+function rotateSelected(){if(selectedBuilding>=0){let b=s.placed[selectedBuilding],next=(b.rotation+1)%2,w=next?b.h:b.w,h=next?b.w:b.h;if(!footprintOwned(b.x,b.y,w,h)||occupied(b.x,b.y,w,h,selectedBuilding)){alert('Not enough free unlocked land to rotate.');return}b.rotation=next;save();draw();refresh()}else if(window.pendingBuild){rotateNext=!rotateNext;alert('Next building placement: '+(rotateNext?'rotated':'normal orientation'))}else alert('Select a placed building or choose one from Build first.')}
 function beginMove(){if(selectedBuilding<0){alert('Tap a building on the map first, then choose Move.');return}moveMode=true;alert('Tap an open tile to move the selected building.')}
 
 function openPanel(which){const shade=document.getElementById('menuShade'),content=document.getElementById('sheetContent');const panels=[...document.querySelectorAll('#gamePanels .panel')];let index={build:0,residents:1,income:2,friends:3}[which];if(index===undefined)return;content.innerHTML='';let clone=panels[index].cloneNode(true);clone.classList.add('active');content.appendChild(clone);document.getElementById('sheetTitle').textContent={build:'🏗️ Build',residents:'🧍 Residents',income:'💰 Building income',friends:'👥 Friends'}[which];shade.classList.add('open');if(which==='build')buildMenuIn(clone);if(which==='residents')renderResidentsIn(clone);if(which==='income')renderIncomeIn(clone)}
@@ -404,14 +520,18 @@ function openCharacter(name){
  const t=s.tasks[name],remaining=t?t.endsAt-Date.now():0;
  const content=document.getElementById('sheetContent');
  document.getElementById('sheetTitle').textContent=c.emoji+' '+c.name;
- let html='<div class="character-profile"><div class="character-avatar">'+c.emoji+'</div><div><b>'+c.name+'</b><p>'+residentBios[name]+'</p></div></div>';
+ let html='<div class="character-profile"><div class="character-avatar">'+c.emoji+'</div><div><b>'+c.name+'</b><p>'+(residentBios[name]||'A lively neighbor with new stories and jobs to explore.')+'</p></div></div>';
  if(t){html+='<div class="task"><div><b>'+((residentJobs[name]||[])[t.jobIndex||0]||'Working')+'</b><div class="subtle">'+fmt(remaining)+'</div></div>'+(remaining<=0?'<button onclick="collectTask(\''+name+'\');openCharacter(\''+name+'\')">Collect XP</button>':'<b>⏳</b>')+'</div>';}
  else{html+='<p class="subtle">Choose a job. Rewards give XP and help you level up.</p>';
- html+=taskChoices.map((job,i)=>'<div class="task"><div><b>'+(residentJobs[name]||[])[i]+'</b><div class="subtle">'+job.label+' · '+job.xp+' XP</div></div><button onclick="startTask(\''+name+'\','+i+');openCharacter(\''+name+'\')">Start</button></div>').join('');}
+ html+=taskChoices.map((job,i)=>'<div class="task"><div><b>'+((residentJobs[name]||[])[i]||['Help around town','Meet the neighbors','Explore the district','Work on a community project','Plan a big celebration'][i])+'</b><div class="subtle">'+job.label+' · '+job.xp+' XP</div></div><button onclick="startTask(\''+name+'\','+i+');openCharacter(\''+name+'\')">Start</button></div>').join('');}
  content.innerHTML=html;document.getElementById('menuShade').classList.add('open');
 }
 
-function openTaskBook(){let q=activeStory();let done=s.storyStage;let rows=`<div class="quest-row"><b>⭐ ${q.title}</b><p>${q.objective}</p><small>Story chapter ${Math.min(done+1,STORY.length)} of ${STORY.length} · Reward: ${q.reward} XP</small><div style="margin-top:8px"><button class="story-action" onclick="closeTaskBook();storyModal()">Story dialogue</button></div></div>`+STORY.slice(0,done).map(a=>`<div class="quest-row"><b>✓ ${a.title}</b><small>Completed · ${a.reward} XP earned</small></div>`).join('');document.getElementById('taskBookContent').innerHTML=rows;document.getElementById('taskShade').classList.add('open')}
+const SEASONS=['Halloween','Winterfest','Valentines','Spring Fair','Summer'];
+function openEvents(){const content=document.getElementById('sheetContent');document.getElementById('sheetTitle').textContent='🎉 Seasonal Events';content.innerHTML='<p class="notice">Choose a festival to activate its limited themed buildings. Events are original to Our Springfield; your town progress stays intact.</p>'+SEASONS.map(e=>'<div class="task"><div><b>'+e+'</b><div class="subtle">'+(s.activeEvent===e?'Currently active':'Unlock themed buildings as you level up')+'</div></div><button onclick="activateEvent(\''+e+'\')">'+(s.activeEvent===e?'Active':'Start')+'</button></div>').join('')+'<div class="task"><div><b>Daily town visit</b><div class="subtle">Earn 30 XP once per calendar day</div></div><button onclick="dailyReward()">Collect</button></div>';document.getElementById('menuShade').classList.add('open')}
+function activateEvent(e){if(!SEASONS.includes(e))return;s.activeEvent=e;save();refresh();openEvents()}
+function dailyReward(){let day=new Date().toLocaleDateString('en-CA');if(s.dailyClaim===day){alert('You already collected today!');return}s.dailyClaim=day;s.xp+=30;save();refresh();alert('Daily visit reward: 30 XP!');openEvents()}
+function openTaskBook(){let q=activeStory();let done=s.storyStage;let rows=`<div class="quest-row"><b>⭐ ${q.title}</b><p>${q.objective}</p><small>Story chapter ${Math.min(done+1,STORY.length)} of ${STORY.length} · Reward: ${q.reward} XP</small><div style="margin-top:8px"><button class="story-action" onclick="closeTaskBook();storyModal()">Story dialogue</button></div></div>`+STORY.slice(0,done).map(a=>`<div class="quest-row"><b>✓ ${a.title}</b><small>Completed · ${a.reward} XP earned</small></div>`).join('');document.getElementById('taskBookContent').innerHTML=rows+'<div class="quest-row"><b>🎉 Festivals and daily rewards</b><p>Unlock themed buildings, change the current event, and collect a daily XP bonus.</p><button onclick="closeTaskBook();openEvents()">Open events</button></div>';document.getElementById('taskShade').classList.add('open')}
 function closeTaskBook(){document.getElementById('taskShade').classList.remove('open')}
 function init(){resize();refresh();draw();setInterval(()=>{if(document.visibilityState==='visible')requestDraw();},400);setInterval(()=>{renderCharacterRail();renderResidents();renderIncome();if(document.getElementById('menuShade').classList.contains('open')){let title=document.getElementById('sheetTitle').textContent;if(title.includes('Residents'))renderResidentsIn(document.getElementById('sheetContent'));if(title.includes('income'))renderIncomeIn(document.getElementById('sheetContent'))}},5000)}window.addEventListener('resize',resize);init();if(!s.storySeen)setTimeout(storyModal,550);
 </script></body></html>

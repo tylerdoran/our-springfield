@@ -1,12 +1,7 @@
-Our Springfield v1.6 — Character Interactions
+Our Springfield v1.8 — Content expansion
 
-What's new:
-- Tap a visible resident directly on the map to open that resident's profile.
-- Resident profiles have an original biography and five individually named timed jobs.
-- Start a job, see its remaining time, and collect XP from the profile.
-- The left character rail opens the same individual resident profile.
-- Existing saves, story progression, zoom and building placement are preserved.
+Includes 100+ original buildings/decorations across themed categories, 8 additional residents, 5 seasonal event collections, a daily XP reward, and the existing 81 plot expansion map. Unlimited money and donuts remain; level and story unlocks still apply.
 
-INSTALL: Extract the ZIP and upload index.html to the root of your GitHub Pages repository, replacing the old index.html. Do not upload the ZIP itself. Keep your existing manifest, icons and other assets.
+Extract and upload index.html to the root of your GitHub Pages repository. Keep existing icons/manifest files. Saved progress is retained.
 
-This version does NOT reset your progress again. The v1.5 reset remains a one-time migration.
+This is new original content, not a copy of proprietary Simpsons Tapped Out assets or its entire catalog.
