@@ -110,12 +110,13 @@ nav{position:fixed;bottom:0;left:0;right:0;background:#fff9f1;border-top:1px sol
 
 .story-shade{position:fixed;inset:0;z-index:50;background:#151d27bd;display:none;align-items:center;justify-content:center;padding:18px}.story-shade.open{display:flex}.story-card{width:min(460px,92vw);max-height:82vh;overflow:auto;background:#fff5d6;border:4px solid #553f2b;border-radius:18px;box-shadow:0 12px 0 #3c3024,0 20px 60px #0008;padding:20px;color:#352b23;text-align:center}.story-card h2{font-size:24px;margin:6px}.story-face{font-size:50px}.story-card p{font-size:15px;line-height:1.5}.story-card button,.story-action{background:#f4c947;border:2px solid #6b4a24;border-radius:12px;padding:10px 18px;font-weight:900;cursor:pointer}.story-reset{position:fixed;top:43px;right:8px;z-index:10;border-radius:8px;background:#fff8;border:1px solid #555;padding:4px 7px;font-size:10px}
 .new-game-menu{display:block;margin:6px 0 12px;padding:9px 12px;background:#f6d7e4;border:2px solid #87506d;border-radius:10px;color:#57334a;font-weight:850;cursor:pointer;font-size:13px}
+.character-profile{display:flex;align-items:center;gap:12px;padding:10px;background:#fff8e7;border:2px solid #e6cf9c;border-radius:12px;margin-bottom:10px;color:#403126}.character-avatar{font-size:48px;min-width:64px;text-align:center}.character-profile p{font-size:12px;margin:5px 0 0;line-height:1.35}
 </style></head><body>
 <header><div class="brand">🍩 OUR SPRINGFIELD</div><div class="balances"><div class="pill">💵 ∞</div><div class="pill">🍩 ∞</div></div></header>
 <main>
 <div class="status"><div><span class="level" id="level">LEVEL 1</span><span class="xp"><i id="xpbar"></i></span> <small id="xptext">0 / 100 XP</small></div><strong id="townName">Your Town</strong></div>
 <div class="layout"><div class="town-area">
-<div class="scene"><canvas id="town"></canvas><div class="hint">Drag to move · Pinch to zoom · Cartoon residents now walk around town</div><div class="quest-float"><b>📜 Current task</b><small id="questCount">0 / 3</small><div id="quest" class="notice">Welcome! Place your first home to begin building your town.</div></div><div class="build-controls"><button onclick="beginMove()">↔ Move</button><button onclick="rotateSelected()">⟳ Rotate</button></div></div>
+<div class="scene"><canvas id="town"></canvas><div class="hint">Drag to move · Pinch to zoom · Tap a resident to give them a task</div><div class="quest-float"><b>📜 Current task</b><small id="questCount">0 / 3</small><div id="quest" class="notice">Welcome! Place your first home to begin building your town.</div></div><div class="build-controls"><button onclick="beginMove()">↔ Move</button><button onclick="rotateSelected()">⟳ Rotate</button></div></div>
 </div><div class="right" id="gamePanels">
 <section class="panel"><h3>🏗️ Build menu</h3><div class="toolbar" id="tabs"></div><div class="cards" id="catalog"></div></section>
 <section class="panel"><h3>🧍 Residents & tasks</h3><div id="residents"></div></section><section class="panel"><h3>💰 Building income</h3><div id="income"></div></section>
@@ -293,6 +294,7 @@ function draw(){let W=canvas.clientWidth,H=canvas.clientHeight;if(!W||!H)return;
  s.placed.slice().sort((a,b)=>(a.x+a.y)-(b.x+b.y)).forEach(drawBuilding);
  // Original hand-drawn cartoon residents, rendered at readable size in the actual town.
  const now=Date.now();
+ visibleResidents=[];
  chars.filter(c=>isCharacterUnlocked(c)).forEach((c,i)=>{
   const busy=!!s.tasks[c.name]&&s.tasks[c.name].endsAt>now;
   const t=now/1000+i*2.3;
@@ -301,6 +303,7 @@ function draw(){let W=canvas.clientWidth,H=canvas.clientHeight;if(!W||!H)return;
   const x=homeX+Math.sin(t*.55)*.42*wander;
   const y=homeY+Math.cos(t*.55)*.27*wander;
   const foot=project(x,y),z=scale;
+  visibleResidents.push({name:c.name,x:foot.x,y:foot.y-40*z,r:Math.max(22,26*z)});
   ctx.fillStyle='#31552b55';ctx.beginPath();ctx.ellipse(foot.x,foot.y+5*z,13*z,5*z,0,0,Math.PI*2);ctx.fill();
   drawResident(c,x,y,chars.indexOf(c));
   if(s.tasks[c.name]&&now>=s.tasks[c.name].endsAt){
@@ -312,6 +315,8 @@ function draw(){let W=canvas.clientWidth,H=canvas.clientHeight;if(!W||!H)return;
  });
  if(chosen){let p=project(chosen.x,chosen.y);ctx.strokeStyle='#ffe16b';ctx.lineWidth=3;ctx.beginPath();ctx.ellipse(p.x,p.y,TW*.55*scale,TH*.55*scale,0,0,Math.PI*2);ctx.stroke()}
 }
+let visibleResidents=[];
+function hitResident(px,py){for(let i=visibleResidents.length-1;i>=0;i--){let c=visibleResidents[i];if(Math.hypot(px-c.x,py-c.y)<c.r)return c.name}return null}
 function hitTile(px,py){let best=null,dist=1e9;for(let y=0;y<18;y++)for(let x=0;x<22;x++){let p=project(x+.5,y+.5),d=Math.hypot((px-p.x)/scale,(py-p.y)/scale);if(d<dist){dist=d;best={x,y}}}return dist<Math.max(24,Math.min(42,TH*1.15*scale))?best:null}
 // Pointer gestures: single-finger pan/tap, two-finger pinch around the midpoint.
 const pointers=new Map();
@@ -348,6 +353,7 @@ function finishPointer(e,cancelled=false){
  if(cancelled||!wasSingle||wasPan||wasGesture){if(!pointers.size)startPt=null;return}
  const r=canvas.getBoundingClientRect(),px=e.clientX-r.left,py=e.clientY-r.top;
  if(moveMode&&selectedBuilding>=0){let t=hitTile(px,py);if(t){let b=s.placed[selectedBuilding],bw=b.rotation%2?b.h:b.w,bh=b.rotation%2?b.w:b.h;if(!occupied(t.x,t.y,bw,bh,selectedBuilding)){b.x=t.x;b.y=t.y;save();moveMode=false;selectedBuilding=-1;chosen=null;refresh();requestDraw()}else alert('That space is occupied.')}startPt=null;return}
+ if(!window.pendingBuild){const resident=hitResident(px,py);if(resident){openCharacter(resident);startPt=null;return}}
  let hit=-1;for(let i=s.placed.length-1;i>=0;i--){let b=s.placed[i],bw=b.rotation%2?b.h:b.w,bh=b.rotation%2?b.w:b.h,p=project(b.x+bw/2,b.y+bh/2);if(Math.hypot(px-p.x,py-(p.y-12*scale))<34*scale){hit=i;break}}
  if(hit>=0){selectedBuilding=hit;chosen={x:s.placed[hit].x,y:s.placed[hit].y};requestDraw();startPt=null;return}
  let t=hitTile(px,py);if(!t){chosen=null;requestDraw();startPt=null;return}
@@ -368,7 +374,7 @@ function refresh(){document.getElementById('level').textContent='LEVEL '+s.level
 const taskChoices=[{label:'1 minute',ms:60000,xp:5},{label:'1 hour',ms:3600000,xp:15},{label:'4 hours',ms:14400000,xp:35},{label:'8 hours',ms:28800000,xp:60},{label:'24 hours',ms:86400000,xp:120}];
 function fmt(ms){if(ms<=0)return 'Ready to collect';let m=Math.ceil(ms/60000);if(m<60)return m+'m remaining';let h=Math.floor(m/60),r=m%60;return h+'h '+(r?r+'m':'')+' remaining'}
 function renderResidents(){document.getElementById('residents').innerHTML=chars.map((c,i)=>{let t=s.tasks[c.name],locked=!isCharacterUnlocked(c),remaining=t?t.endsAt-Date.now():0;let status=t?(remaining>0?fmt(remaining):'Task complete · collect XP'):'Choose a task';return `<div class="task"><div style="flex:1"><b>${c.emoji} ${c.name}</b><div class="subtle">${locked?'Unlocks at level '+c.level:status}</div>${t&&remaining>0?`<div class="progress"><i style="width:${Math.max(2,Math.min(100,(1-remaining/t.duration)*100))}%"></i></div>`:''}</div>${locked?'<b>🔒</b>':t?(remaining>0?'<b>⏳</b>':`<button onclick="collectTask('${c.name}')">Collect</button>`):`<button onclick="startTask('${c.name}',0)">1m</button>`}</div>${!locked&&!t?`<div class="mini-actions">${taskChoices.slice(1).map((q,j)=>`<button onclick="startTask('${c.name}',${j+1})">${q.label}</button>`).join('')}</div>`:''}`}).join('')}
-function startTask(name,index){let c=chars.find(c=>c.name===name);if(!c||!isCharacterUnlocked(c))return;let q=taskChoices[index];s.tasks[name]={startedAt:Date.now(),endsAt:Date.now()+q.ms,duration:q.ms,xp:q.xp};save();refresh()}
+function startTask(name,index){let c=chars.find(c=>c.name===name);if(!c||!isCharacterUnlocked(c))return;let q=taskChoices[index];s.tasks[name]={startedAt:Date.now(),endsAt:Date.now()+q.ms,duration:q.ms,xp:q.xp,jobIndex:index};save();refresh()}
 function collectTask(name){let t=s.tasks[name];if(!t||Date.now()<t.endsAt)return;s.xp+=t.xp;delete s.tasks[name];storyComplete('task',name);refresh();draw()}
 function renderIncome(){let now=Date.now();document.getElementById('income').innerHTML=s.placed.length?s.placed.map((b,i)=>{let elapsed=now-(b.lastCollected||now),ready=Math.floor(elapsed/(b.interval||60000)),amount=ready*(b.income||10);return `<div class="task"><div style="flex:1"><b>${b.emoji} ${b.name}</b><div class="subtle">${amount>0?'$'+amount+' ready to collect':'Next payout in '+fmt((b.interval||60000)-(elapsed%(b.interval||60000)))}</div></div><button onclick="collectIncome(${i})" ${amount<=0?'disabled style="opacity:.45"':''}>Collect</button></div>`}).join(''):'<p class="notice">Place buildings to start earning town income.</p>'}
 function collectIncome(i){let b=s.placed[i];if(!b)return;let now=Date.now(),n=Math.floor((now-(b.lastCollected||now))/(b.interval||60000));if(n<1)return;let earned=n*(b.income||10);b.lastCollected=(b.lastCollected||now)+n*(b.interval||60000);s.xp+=Math.max(1,Math.floor(earned/10));save();storyComplete('income');refresh();draw();alert('Collected $'+earned+' and earned XP!')}
@@ -381,7 +387,30 @@ function buildMenuIn(root){let oldTabs=root.querySelector('#tabs'),oldCatalog=ro
 function renderResidentsIn(root){let target=root.querySelector('#residents');if(target)target.innerHTML=document.getElementById('residents').innerHTML}
 function renderIncomeIn(root){let target=root.querySelector('#income');if(target)target.innerHTML=document.getElementById('income').innerHTML}
 function renderCharacterRail(){let rail=document.getElementById('characterRail');if(!rail)return;rail.innerHTML=chars.filter(c=>isCharacterUnlocked(c)).map(c=>{let t=s.tasks[c.name],ready=t&&Date.now()>=t.endsAt;return `<button class="${t?(ready?'ready':'busy'):''}" title="${c.name}" onclick="openCharacter('${c.name}')">${c.emoji}</button>`}).join('')}
-function openCharacter(name){openPanel('residents');setTimeout(()=>{let nodes=[...document.querySelectorAll('#sheetContent .task')];let n=nodes.find(x=>x.textContent.includes(name));if(n)n.scrollIntoView({block:'center',behavior:'smooth'})},60)}
+const residentBios={
+ 'Mayor Maple':'The town’s optimistic mayor. Always has another plan for rebuilding.',
+ 'Riley':'Your first neighbor. Loves fixing things and making a fresh start.',
+ 'Casey':'An energetic resident who keeps the neighborhood lively.',
+ 'Coach Cedar':'A spirited coach who wants everyone to get moving.'
+};
+const residentJobs={
+ 'Mayor Maple':['Inspect the town','Hold an office meeting','Plan the next neighborhood','Review town improvements','Write a grand rebuilding plan'],
+ 'Riley':['Unpack moving boxes','Help the neighbors','Fix up the cottage','Explore the new town','Organize a block party'],
+ 'Casey':['Water the flowers','Visit the local shops','Paint a colorful mural','Plan a community picnic','Host a neighborhood festival'],
+ 'Coach Cedar':['Take a quick jog','Practice with the team','Run a training session','Organize a sports day','Lead a town tournament']
+};
+function openCharacter(name){
+ const c=chars.find(x=>x.name===name);if(!c||!isCharacterUnlocked(c))return;
+ const t=s.tasks[name],remaining=t?t.endsAt-Date.now():0;
+ const content=document.getElementById('sheetContent');
+ document.getElementById('sheetTitle').textContent=c.emoji+' '+c.name;
+ let html='<div class="character-profile"><div class="character-avatar">'+c.emoji+'</div><div><b>'+c.name+'</b><p>'+residentBios[name]+'</p></div></div>';
+ if(t){html+='<div class="task"><div><b>'+((residentJobs[name]||[])[t.jobIndex||0]||'Working')+'</b><div class="subtle">'+fmt(remaining)+'</div></div>'+(remaining<=0?'<button onclick="collectTask(\''+name+'\');openCharacter(\''+name+'\')">Collect XP</button>':'<b>⏳</b>')+'</div>';}
+ else{html+='<p class="subtle">Choose a job. Rewards give XP and help you level up.</p>';
+ html+=taskChoices.map((job,i)=>'<div class="task"><div><b>'+(residentJobs[name]||[])[i]+'</b><div class="subtle">'+job.label+' · '+job.xp+' XP</div></div><button onclick="startTask(\''+name+'\','+i+');openCharacter(\''+name+'\')">Start</button></div>').join('');}
+ content.innerHTML=html;document.getElementById('menuShade').classList.add('open');
+}
+
 function openTaskBook(){let q=activeStory();let done=s.storyStage;let rows=`<div class="quest-row"><b>⭐ ${q.title}</b><p>${q.objective}</p><small>Story chapter ${Math.min(done+1,STORY.length)} of ${STORY.length} · Reward: ${q.reward} XP</small><div style="margin-top:8px"><button class="story-action" onclick="closeTaskBook();storyModal()">Story dialogue</button></div></div>`+STORY.slice(0,done).map(a=>`<div class="quest-row"><b>✓ ${a.title}</b><small>Completed · ${a.reward} XP earned</small></div>`).join('');document.getElementById('taskBookContent').innerHTML=rows;document.getElementById('taskShade').classList.add('open')}
 function closeTaskBook(){document.getElementById('taskShade').classList.remove('open')}
 function init(){resize();refresh();draw();setInterval(()=>{if(document.visibilityState==='visible')requestDraw();},400);setInterval(()=>{renderCharacterRail();renderResidents();renderIncome();if(document.getElementById('menuShade').classList.contains('open')){let title=document.getElementById('sheetTitle').textContent;if(title.includes('Residents'))renderResidentsIn(document.getElementById('sheetContent'));if(title.includes('income'))renderIncomeIn(document.getElementById('sheetContent'))}},5000)}window.addEventListener('resize',resize);init();if(!s.storySeen)setTimeout(storyModal,550);

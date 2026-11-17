@@ -1,7 +1,12 @@
-Our Springfield v1.5 — forced automatic fresh start
+Our Springfield v1.6 — Character Interactions
 
-This update automatically deletes the old local town once, even if the v1.3 reset flag was already set. All old buildings, XP, tasks and story progress are erased. The player starts at Level 1 with the first introductory story. The v1.5 reset flag prevents repeat resets on subsequent launches. Unlimited money and donuts remain.
+What's new:
+- Tap a visible resident directly on the map to open that resident's profile.
+- Resident profiles have an original biography and five individually named timed jobs.
+- Start a job, see its remaining time, and collect XP from the profile.
+- The left character rail opens the same individual resident profile.
+- Existing saves, story progression, zoom and building placement are preserved.
 
-Upload index.html to the same GitHub Pages repository, replacing the previous version. Wait for Pages deployment to finish. Open the GitHub Pages site in Safari and reload it, then launch the Home Screen app. If you see an older game, Safari may be using a cached version; reload the GitHub Pages site first.
+INSTALL: Extract the ZIP and upload index.html to the root of your GitHub Pages repository, replacing the old index.html. Do not upload the ZIP itself. Keep your existing manifest, icons and other assets.
 
-WARNING: the reset is irreversible without a backup.
+This version does NOT reset your progress again. The v1.5 reset remains a one-time migration.
