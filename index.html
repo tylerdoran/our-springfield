@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#f58bb7"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="donut.svg" type="image/svg+xml">
+<title>Our Springfield</title>
+<style>
+:root{--pink:#f58bb7;--deep:#b94e80;--cream:#fff7e9;--ink:#3d3040;--green:#a8d69a}
+*{box-sizing:border-box}body{margin:0;background:#b9e4f0;color:var(--ink);font-family:system-ui,-apple-system,sans-serif}
+header{position:sticky;top:0;z-index:3;background:linear-gradient(100deg,#f7a4c7,#f7c0d7);padding:12px 14px calc(12px + env(safe-area-inset-top));box-shadow:0 2px 8px #74445b33}
+.top{display:flex;align-items:center;justify-content:space-between;gap:8px}.brand{font-weight:900;font-size:20px}.wallet{background:#fff9;border:1px solid #fff;border-radius:20px;padding:6px 10px;font-weight:800;font-size:13px}
+main{max-width:900px;margin:auto;padding:12px 12px 100px}.townbar{display:flex;justify-content:space-between;align-items:center;margin:8px 2px 12px}.townbar h2{margin:0;font-size:18px}
+button{border:0;border-radius:14px;padding:10px 13px;background:var(--deep);color:white;font-weight:750;font-size:14px;box-shadow:0 2px 0 #843657;cursor:pointer}button.secondary{background:#fff;color:var(--deep);box-shadow:0 2px 0 #e3a9c3}button:active{transform:translateY(1px);box-shadow:none}
+.world{position:relative;overflow:hidden;border:5px solid #fff;border-radius:22px;background:#a8d69a;box-shadow:0 6px 18px #315b5b33;min-height:410px}
+.grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;padding:12px;background:linear-gradient(135deg,#b5dc9f,#a0d18d)}
+.tile{aspect-ratio:1;border-radius:9px;background:#b7df9f;display:flex;align-items:center;justify-content:center;font-size:clamp(22px,6vw,42px);position:relative;border:1px solid #ffffff55;cursor:pointer;user-select:none}
+.tile:nth-child(3n){background:#abd593}.tile.road{background:#c9c4b6}.tile.selected{outline:3px solid #ffdf67;z-index:1}
+.tile small{position:absolute;bottom:2px;font-size:8px;background:#fff9;border-radius:5px;padding:1px 3px}
+.hint{font-size:12px;color:#49624b;text-align:center;padding:8px}
+.panel{background:var(--cream);border:2px solid white;border-radius:20px;padding:14px;margin-top:14px;box-shadow:0 4px 12px #3453}
+.panel h3{margin:0 0 10px}.tabs{display:flex;gap:7px;overflow:auto;padding:3px 0 10px}.tabs button{white-space:nowrap}.tabs button.active{background:#71415e}
+.items{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.item{background:white;border:1px solid #f0d9e4;border-radius:14px;padding:10px;display:flex;gap:9px;align-items:center;min-width:0}.emoji{font-size:29px}.item b{display:block;font-size:13px}.item small{color:#806d78}
+.item button{margin-left:auto;padding:8px;font-size:12px}
+.task{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px;background:white;border-radius:13px;margin:7px 0}.task .who{font-size:14px;font-weight:800}.task small{display:block;color:#806d78}
+nav{position:fixed;bottom:0;left:0;right:0;z-index:4;background:#fff9f2;border-top:1px solid #e8c9d8;display:flex;justify-content:space-around;padding:8px 4px calc(8px + env(safe-area-inset-bottom))}
+nav button{background:transparent;color:#70475c;box-shadow:none;padding:6px;font-size:12px;display:flex;flex-direction:column;align-items:center;gap:2px}nav button span{font-size:21px}
+.notice{font-size:12px;color:#76596a;line-height:1.45}
+.modal{position:fixed;inset:0;background:#24152588;display:none;align-items:center;justify-content:center;padding:20px;z-index:10}.modal.show{display:flex}.dialog{background:var(--cream);border-radius:20px;padding:18px;width:min(100%,420px);box-shadow:0 10px 40px #24152555}.dialog h3{margin-top:0}.dialog input{width:100%;padding:12px;border:1px solid #d9b9c9;border-radius:10px;margin:6px 0 12px;font:inherit}
+@media(min-width:650px){.items{grid-template-columns:repeat(3,minmax(0,1fr))}.grid{grid-template-columns:repeat(9,1fr)}}
+</style></head>
+<body>
+<header><div class="top"><div class="brand">🍩 Our Springfield</div><div class="wallet">💵 ∞ &nbsp; 🍩 ∞</div></div></header>
+<main>
+ <div class="townbar"><h2 id="townName">Your Town</h2><button class="secondary" onclick="renameTown()">✏️ Rename</button></div>
+ <section class="world"><div class="grid" id="grid"></div><div class="hint">Tap an empty tile to select it, then choose a building below.</div></section>
+ <section class="panel" id="buildPanel"><h3>🏗️ Build your town</h3><div class="tabs" id="tabs"></div><div class="items" id="catalog"></div></section>
+ <section class="panel"><h3>🧍 Character tasks</h3><div id="tasks"></div></section>
+ <section class="panel"><h3>👥 Friends</h3><p class="notice">Friend invitations become available when the online account service is connected. This prototype currently saves your town on this device.</p><button onclick="inviteInfo()">＋ Invite a friend</button></section>
+ <section class="panel"><h3>⭐ Game settings</h3><p class="notice">Unlimited cash and donuts are enabled. This is an original fan-made town-building prototype, not an official Simpsons game.</p><button class="secondary" onclick="resetTown()">Reset this town</button></section>
+</main>
+<nav><button onclick="scrollTo(0,0)"><span>🏡</span>Town</button><button onclick="document.getElementById('buildPanel').scrollIntoView({behavior:'smooth'})"><span>🏗️</span>Build</button><button onclick="document.getElementById('tasks').scrollIntoView({behavior:'smooth'})"><span>🧍</span>Tasks</button><button onclick="document.querySelectorAll('.panel')[2].scrollIntoView({behavior:'smooth'})"><span>👥</span>Friends</button></nav>
+<div class="modal" id="modal"><div class="dialog"><h3 id="modalTitle"></h3><p id="modalText" class="notice"></p><input id="modalInput" style="display:none"><div style="display:flex;gap:8px;justify-content:flex-end"><button class="secondary" onclick="closeModal()">Close</button><button id="modalOK" onclick="modalAction()">Okay</button></div></div></div>
+<script>
+const buildings=[
+{cat:"Homes",name:"Cozy House",emoji:"🏠"},{cat:"Homes",name:"Family Home",emoji:"🏡"},{cat:"Homes",name:"Apartment Block",emoji:"🏢"},
+{cat:"Shops",name:"Corner Market",emoji:"🏪"},{cat:"Shops",name:"Coffee Shop",emoji:"☕"},{cat:"Shops",name:"Pizza Place",emoji:"🍕"},{cat:"Shops",name:"Movie Theater",emoji:"🎬"},
+{cat:"Civic",name:"Town Hall",emoji:"🏛️"},{cat:"Civic",name:"School",emoji:"🏫"},{cat:"Civic",name:"Fire Station",emoji:"🚒"},{cat:"Civic",name:"Hospital",emoji:"🏥"},
+{cat:"Parks",name:"Town Park",emoji:"🌳"},{cat:"Parks",name:"Fountain",emoji:"⛲"},{cat:"Parks",name:"Playground",emoji:"🛝"},{cat:"Parks",name:"Flower Garden",emoji:"🌷"},
+{cat:"Special",name:"Donut Shop",emoji:"🍩"},{cat:"Special",name:"Festival Stage",emoji:"🎪"},{cat:"Special",name:"Golden Statue",emoji:"🗽"}
+];
+const people=[{name:"Mayor Maple",emoji:"🧑‍💼"},{name:"Riley",emoji:"🧑"},{name:"Casey",emoji:"👩"}];
+let state=JSON.parse(localStorage.getItem("ourSpringfield")||"null")||{town:"Your Town",placed:[],tasks:[]};
+let selected=0,category="All",modalFn=null;
+const save=()=>localStorage.setItem("ourSpringfield",JSON.stringify(state));
+function drawGrid(){const g=document.getElementById("grid");g.innerHTML="";for(let i=0;i<63;i++){let p=state.placed.find(x=>x.tile===i);let d=document.createElement("div");d.className="tile"+(selected===i?" selected":"")+(p&&p.emoji==="🛣️"?" road":"");d.innerHTML=p?`${p.emoji}<small>${p.name}</small>`:"";d.onclick=()=>{selected=i;drawGrid()};g.append(d)}}
+function drawCatalog(){let cats=["All",...new Set(buildings.map(x=>x.cat))];document.getElementById("tabs").innerHTML=cats.map(c=>`<button class="${c===category?'active':''}" onclick="category='${c}';drawCatalog()">${c}</button>`).join("");let list=buildings.filter(x=>category==="All"||x.cat===category);document.getElementById("catalog").innerHTML=list.map((b)=>`<div class="item"><div class="emoji">${b.emoji}</div><div><b>${b.name}</b><small>Free · Unlimited</small></div><button onclick="place('${b.name.replace(/'/g,"\\'")}','${b.emoji}')">Place</button></div>`).join("")}
+function place(name,emoji){if(state.placed.some(x=>x.tile===selected)){alert("That tile is occupied. Choose an empty tile first.");return}state.placed.push({tile:selected,name,emoji});save();drawGrid();selected=(selected+1)%63;drawGrid()}
+function drawTasks(){let el=document.getElementById("tasks");let now=Date.now();state.tasks=state.tasks.filter(t=>t.end>now);el.innerHTML=people.map(p=>{let task=state.tasks.find(t=>t.person===p.name);return `<div class="task"><div><div class="who">${p.emoji} ${p.name}</div><small>${task?`Working: ${task.job} · ${Math.ceil((task.end-now)/1000)} sec left`:"Ready for a task"}</small></div><button ${task?'disabled':''} onclick="startTask('${p.name}')">${task?'Working':'Start job'}</button></div>`}).join("");save()}
+function startTask(person){let job=prompt("Choose a task: Clean up (1 min), Visit neighbors (1 hour), Help at the shop (4 hours)","Clean up");if(!job)return;let mins=/hour/i.test(job)?60:1;state.tasks.push({person,job,end:Date.now()+mins*60000});drawTasks()}
+function renameTown(){showModal("Name your town","",true,()=>{let v=document.getElementById("modalInput").value.trim();if(v){state.town=v;document.getElementById("townName").textContent=v;save()}})}
+function inviteInfo(){showModal("Invite your friends","Online friend invitations aren't connected in this prototype yet. The next development step is adding secure accounts, a hosted database, and invite links so each friend can save and visit their own town.",false,()=>{})}
+function resetTown(){if(confirm("Reset this town on this device?")){state={town:"Your Town",placed:[],tasks:[]};save();init()}}
+function showModal(title,txt,input,fn){modalFn=fn;document.getElementById("modalTitle").textContent=title;document.getElementById("modalText").textContent=txt;document.getElementById("modalInput").style.display=input?"block":"none";document.getElementById("modal").classList.add("show")}
+function closeModal(){document.getElementById("modal").classList.remove("show")}
+function modalAction(){if(modalFn)modalFn();closeModal()}
+function init(){document.getElementById("townName").textContent=state.town;drawGrid();drawCatalog();drawTasks()}
+init();setInterval(drawTasks,1000);
+if("serviceWorker" in navigator && location.protocol.startsWith("http"))navigator.serviceWorker.register("./sw.js").catch(()=>{});
+</script></body></html>

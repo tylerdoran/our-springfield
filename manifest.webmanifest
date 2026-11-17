@@ -1,0 +1,16 @@
+{
+  "name": "Our Springfield",
+  "short_name": "Springfield",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#b9e4f0",
+  "theme_color": "#f58bb7",
+  "icons": [
+    {
+      "src": "donut.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
