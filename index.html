@@ -509,16 +509,42 @@ function drawBackground(){if(backgroundCanvas)return backgroundCanvas;
  scale=oldScale;ox=oldOx;oy=oldOy;return backgroundCanvas;
 }
 
+// Transient resident reactions are visual only; saved progress is unchanged.
+const residentReactions=new Map();
+const residentLines={
+ 'Mayor Maple':['A fine day for rebuilding!','The town is coming along!','More parks, please!'],
+ 'Riley':['Time to get to work!','Nice neighborhood!','I love this place!'],
+ 'Casey':['Something fun is happening!','Let’s brighten the town!','Looking good!'],
+ 'Coach Cedar':['Keep moving!','Teamwork wins!','One more lap!']
+};
+function greetResident(name){
+ const lines=residentLines[name]||['What a lovely day!','Hello, neighbor!','See you around town!'];
+ const last=residentReactions.get(name);
+ residentReactions.set(name,{until:Date.now()+2400,line:lines[last?((last.lineIndex+1)%lines.length):0],lineIndex:last?((last.lineIndex+1)%lines.length):0});
+ requestDraw();
+}
+function residentSpeech(x,y,z,text){
+ ctx.save();ctx.font=`bold ${Math.max(10,12*z)}px system-ui`;
+ const width=Math.min(205,ctx.measureText(text).width+18),height=25;
+ const bx=Math.max(width/2+6,Math.min(canvas.clientWidth-width/2-6,x)),by=Math.max(height+6,y-79*z);
+ ctx.fillStyle='#fff9e8';ctx.strokeStyle='#493d31';ctx.lineWidth=2;
+ ctx.beginPath();ctx.roundRect(bx-width/2,by-height,width,height,8);ctx.fill();ctx.stroke();
+ ctx.beginPath();ctx.moveTo(bx-5,by);ctx.lineTo(bx,by+7);ctx.lineTo(bx+6,by);ctx.fill();ctx.stroke();
+ ctx.fillStyle='#3c3026';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(text,bx,by-height/2);ctx.restore();
+}
 function drawResident(c,x,y,index,walking=false,phase=0){
  const p=project(x,y),z=scale*1.42,skin='#f4cf45',outline='#3d3028';
+ const reaction=residentReactions.get(c.name),reacting=reaction&&reaction.until>Date.now();
+ const bob=walking?Math.abs(Math.sin(phase))*1.5*z:Math.sin(phase*.2)*.45*z;
+ p.y-=bob;
  const shirts=['#f4f0e5','#e36e9d','#477d55','#9873b8'];
  ctx.save();ctx.lineCap='round';ctx.lineJoin='round';ctx.lineWidth=2*z;ctx.strokeStyle=outline;
  // feet and legs
  ctx.fillStyle='#344d70';ctx.beginPath();const stride=walking?Math.sin(phase)*3.2*z:0;ctx.roundRect(p.x-5*z+stride,p.y-8*z,4*z,13*z,2*z);ctx.roundRect(p.x+1*z-stride,p.y-8*z,4*z,13*z,2*z);ctx.fill();ctx.stroke();
  ctx.fillStyle='#f7f3e9';ctx.beginPath();ctx.ellipse(p.x-4*z+stride,p.y+6*z,5*z,2.5*z,0,0,Math.PI*2);ctx.ellipse(p.x+5*z-stride,p.y+6*z,5*z,2.5*z,0,0,Math.PI*2);ctx.fill();ctx.stroke();
  // arms behind torso
- ctx.strokeStyle=skin;ctx.lineWidth=4*z;ctx.beginPath();ctx.moveTo(p.x-6*z,p.y-23*z);ctx.lineTo(p.x-10*z-stride*.55,p.y-9*z);ctx.moveTo(p.x+6*z,p.y-23*z);ctx.lineTo(p.x+10*z+stride*.55,p.y-9*z);ctx.stroke();
- ctx.fillStyle=skin;ctx.beginPath();ctx.arc(p.x-10*z,p.y-8*z,2.5*z,0,Math.PI*2);ctx.arc(p.x+10*z,p.y-8*z,2.5*z,0,Math.PI*2);ctx.fill();ctx.strokeStyle=outline;ctx.lineWidth=1*z;ctx.stroke();
+ ctx.strokeStyle=skin;ctx.lineWidth=4*z;ctx.beginPath();ctx.moveTo(p.x-6*z,p.y-23*z);ctx.lineTo(p.x-10*z-stride*.55,p.y-9*z);ctx.moveTo(p.x+6*z,p.y-23*z);ctx.lineTo(p.x+10*z+stride*.55,p.y-(reacting?33:9)*z);ctx.stroke();
+ ctx.fillStyle=skin;ctx.beginPath();ctx.arc(p.x-10*z,p.y-8*z,2.5*z,0,Math.PI*2);ctx.arc(p.x+10*z,p.y-(reacting?33:8)*z,2.5*z,0,Math.PI*2);ctx.fill();ctx.strokeStyle=outline;ctx.lineWidth=1*z;ctx.stroke();
  // shirt with collar
  ctx.fillStyle=shirts[index%shirts.length];ctx.strokeStyle=outline;ctx.lineWidth=1.8*z;ctx.beginPath();ctx.moveTo(p.x-7*z,p.y-25*z);ctx.quadraticCurveTo(p.x,p.y-29*z,p.x+7*z,p.y-25*z);ctx.lineTo(p.x+7*z,p.y-9*z);ctx.quadraticCurveTo(p.x,p.y-6*z,p.x-7*z,p.y-9*z);ctx.closePath();ctx.fill();ctx.stroke();
  // neck and oversized expressive yellow face
@@ -531,7 +557,7 @@ function drawResident(c,x,y,index,walking=false,phase=0){
  else {ctx.arc(p.x,p.y-43*z,8*z,Math.PI,Math.PI*2);for(let k=-5;k<=5;k+=4){ctx.moveTo(p.x+k*z,p.y-44*z);ctx.arc(p.x+k*z,p.y-46*z,2.5*z,0,Math.PI*2)}}
  ctx.fill();ctx.stroke();
  // big white eyes, pupils, nose and smile
- ctx.fillStyle='#fff';ctx.beginPath();ctx.ellipse(p.x-2.5*z,p.y-37*z,2.8*z,4*z,0,0,Math.PI*2);ctx.ellipse(p.x+2.5*z,p.y-37*z,2.8*z,4*z,0,0,Math.PI*2);ctx.fill();ctx.strokeStyle=outline;ctx.lineWidth=.8*z;ctx.stroke();
+ ctx.fillStyle='#fff';ctx.beginPath();ctx.ellipse(p.x-2.5*z,p.y-37*z,2.8*z,4*z,0,0,Math.PI*2);ctx.ellipse(p.x+2.5*z,p.y-37*z,2.8*z,Math.sin(phase*.11+index*2)> .995?.5*z:4*z,0,0,Math.PI*2);ctx.fill();ctx.strokeStyle=outline;ctx.lineWidth=.8*z;ctx.stroke();
  ctx.fillStyle='#29231f';ctx.beginPath();ctx.arc(p.x-1.8*z,p.y-37*z,1*z,0,Math.PI*2);ctx.arc(p.x+3*z,p.y-37*z,1*z,0,Math.PI*2);ctx.fill();
  ctx.strokeStyle='#8e4b35';ctx.lineWidth=1*z;ctx.beginPath();ctx.arc(p.x+1*z,p.y-32*z,2.5*z,.15,1.35);ctx.stroke();
  ctx.restore();
@@ -579,6 +605,9 @@ function draw(){let W=canvas.clientWidth,H=canvas.clientHeight;if(!W||!H)return;
   if(foot.x < -90 || foot.x > W+90 || foot.y < -110 || foot.y > H+90)return;
   ctx.fillStyle='#31552b55';ctx.beginPath();ctx.ellipse(foot.x,foot.y+5*z,13*z,5*z,0,0,Math.PI*2);ctx.fill();
   drawResident(c,x,y,chars.indexOf(c),!busy,t*9);
+  const reaction=residentReactions.get(c.name);
+  if(reaction&&reaction.until>now)residentSpeech(foot.x,foot.y,z,reaction.line);
+  if(busy){ctx.save();ctx.font=`${Math.max(12,16*z)}px system-ui`;ctx.textAlign='center';ctx.fillText('⏳',foot.x+19*z,foot.y-53*z);ctx.restore()}
   if(s.tasks[c.name]&&now>=s.tasks[c.name].endsAt){
    ctx.font=`bold ${Math.max(15,20*z)}px system-ui`;ctx.textAlign='center';ctx.fillText('✔️',foot.x,foot.y-78*z);
   }
@@ -718,6 +747,7 @@ const residentJobs={
 };
 function openCharacter(name){
  const c=chars.find(x=>x.name===name);if(!c||!isCharacterUnlocked(c))return;
+ greetResident(name);
  const t=s.tasks[name],remaining=t?t.endsAt-Date.now():0;
  const content=document.getElementById('sheetContent');
  document.getElementById('sheetTitle').textContent=c.emoji+' '+c.name;
