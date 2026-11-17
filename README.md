@@ -1,1 +1,1 @@
-Our Springfield v2.2: roads, sidewalks and dirt path painting. Open Roads at top right, select a brush and tap owned land. Tap Done editing to return to normal play. Existing save is preserved. Replace index.html in GitHub Pages.
+Our Springfield v2.3 — landscaping update. Replace index.html in your GitHub Pages repository. Adds trees, pines, bushes, flowers, lamps and benches through Roads & Landscaping editor. Existing saves are retained.
