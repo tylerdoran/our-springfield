@@ -112,7 +112,7 @@ nav{position:fixed;bottom:0;left:0;right:0;background:#fff9f1;border-top:1px sol
 .new-game-menu{display:block;margin:6px 0 12px;padding:9px 12px;background:#f6d7e4;border:2px solid #87506d;border-radius:10px;color:#57334a;font-weight:850;cursor:pointer;font-size:13px}
 .character-profile{display:flex;align-items:center;gap:12px;padding:10px;background:#fff8e7;border:2px solid #e6cf9c;border-radius:12px;margin-bottom:10px;color:#403126}.character-avatar{font-size:48px;min-width:64px;text-align:center}.character-profile p{font-size:12px;margin:5px 0 0;line-height:1.35}
 #update29Flag{position:fixed;top:10px;right:12px;z-index:99;background:#ffdc58;color:#32261d;border:2px solid #fff;border-radius:13px;padding:7px 11px;font-size:12px;font-weight:950;box-shadow:0 2px 7px #0004;pointer-events:none}
-</style></head><body><div id="update29Flag">UPDATE 34 · DETAILED NEIGHBORHOODS</div>
+</style></head><body><div id="update29Flag">UPDATE 35 · STREETS & SIDEWALKS</div>
 <header><div class="brand">🍩 OUR SPRINGFIELD</div><div class="balances"><div class="pill">💵 ∞</div><div class="pill">🍩 ∞</div></div></header>
 <main>
 <div class="status"><div><span class="level" id="level">LEVEL 1</span><span class="xp"><i id="xpbar"></i></span> <small id="xptext">0 / 100 XP</small></div><strong id="townName">Your Town</strong></div>
@@ -349,6 +349,12 @@ function drawPaths(){
  ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(p.x+hw,p.y+hh);ctx.lineTo(p.x,p.y+2*hh);ctx.lineTo(p.x-hw,p.y+hh);ctx.closePath();
  ctx.fillStyle=kind==='road'?'#777b80':kind==='sidewalk'?'#d8d4c9':'#bc9a65';ctx.fill();
  ctx.strokeStyle=kind==='road'?'#c4c8c9':kind==='sidewalk'?'#f8f3e8':'#8c7145';ctx.lineWidth=Math.max(.6,scale);ctx.stroke();
+ // Update 35: sidewalk paving joints and a thin curb highlight.
+ if(kind==='sidewalk'){
+  ctx.strokeStyle='#b7b1a5';ctx.lineWidth=Math.max(.5,.7*scale);
+  ctx.beginPath();ctx.moveTo(p.x-hw*.42,p.y+hh*.58);ctx.lineTo(p.x+hw*.42,p.y+hh*1.42);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(p.x+hw*.42,p.y+hh*.58);ctx.lineTo(p.x-hw*.42,p.y+hh*1.42);ctx.stroke();
+ }
  if(kind==='road'){
   const adjacent=(dx,dy)=>s.paths[(x+dx)+','+(y+dy)]==='road';
   ctx.strokeStyle='#f7e8a7';ctx.lineWidth=Math.max(1,1.5*scale);ctx.setLineDash([5*scale,6*scale]);
@@ -590,6 +596,42 @@ function drawBackground(){if(backgroundCanvas)return backgroundCanvas;
  const roadTiles=[[0,8],[1,8],[2,8],[3,8],[4,8],[5,8],[6,8],[7,8],[8,8],[9,8],[10,8],[11,8],[12,8],[13,8],[14,8],[15,8],[16,8],[17,8],[18,8],[19,8],[10,7],[10,6],[10,5],[10,4],[10,3]];
  roadTiles.forEach(([x,y])=>{let p=project(x,y),pts=[{x:p.x,y:p.y},{x:p.x+TW/2*scale,y:p.y+TH/2*scale},{x:p.x,y:p.y+TH*scale},{x:p.x-TW/2*scale,y:p.y+TH/2*scale}];bg.beginPath();pts.forEach((q,i)=>i?bg.lineTo(q.x,q.y):bg.moveTo(q.x,q.y));bg.closePath();bg.fillStyle='#d8d4ca';bg.fill();bg.strokeStyle='#aaa69c';bg.lineWidth=1;bg.stroke();
  let inset=5*scale;bg.beginPath();bg.moveTo(p.x,p.y+inset);bg.lineTo(p.x+TW/2*scale,p.y+TH/2*scale);bg.lineTo(p.x,p.y+TH*scale-inset);bg.lineTo(p.x-TW/2*scale,p.y+TH/2*scale);bg.closePath();bg.fillStyle='#888b89';bg.fill();bg.strokeStyle='#f0eee8';bg.lineWidth=1;bg.stroke();});
+ // Update 35: road centerlines, sidewalk joints, crosswalks, and curb greenery.
+ roadTiles.forEach(([x,y])=>{
+  const p=project(x,y),z=scale;
+  const horizontal=y===8, vertical=x===10;
+  bg.save();bg.lineCap='round';
+  // Small pale concrete seams make the roadside look like laid sidewalk slabs.
+  bg.strokeStyle='#f5f0e3';bg.lineWidth=1.1*z;
+  if(horizontal){
+   bg.beginPath();bg.moveTo(p.x-21*z,p.y+12*z);bg.lineTo(p.x-15*z,p.y+17*z);bg.stroke();
+   bg.beginPath();bg.moveTo(p.x+15*z,p.y+17*z);bg.lineTo(p.x+21*z,p.y+12*z);bg.stroke();
+  }
+  if(vertical){
+   bg.beginPath();bg.moveTo(p.x+15*z,p.y+13*z);bg.lineTo(p.x+10*z,p.y+19*z);bg.stroke();
+  }
+  // Dashed yellow lane markers follow the two isometric street axes.
+  bg.strokeStyle='#f6dc79';bg.lineWidth=2*z;bg.setLineDash([9*z,7*z]);
+  if(horizontal){bg.beginPath();bg.moveTo(p.x-18*z,p.y+10*z);bg.lineTo(p.x+18*z,p.y+30*z);bg.stroke()}
+  if(vertical){bg.beginPath();bg.moveTo(p.x+18*z,p.y+10*z);bg.lineTo(p.x-18*z,p.y+30*z);bg.stroke()}
+  bg.setLineDash([]);
+  // Crosswalk bars at the neighborhood junction and near its ends.
+  if((horizontal&&[3,10,16].includes(x))||(vertical&&[4,7].includes(y))){
+   bg.strokeStyle='#fff8e6';bg.lineWidth=3*z;
+   for(let k=-2;k<=2;k++){
+    bg.beginPath();
+    if(horizontal){bg.moveTo(p.x+k*5*z-5*z,p.y+k*2.5*z+12*z);bg.lineTo(p.x+k*5*z+1*z,p.y+k*2.5*z+17*z)}
+    else{bg.moveTo(p.x+k*5*z+3*z,p.y-k*2.5*z+13*z);bg.lineTo(p.x+k*5*z-3*z,p.y-k*2.5*z+18*z)}
+    bg.stroke();
+   }
+  }
+  bg.restore();
+ });
+ // Tufts of grass and flowering verge patches along the main street.
+ for(let x=1;x<19;x+=3){const p=project(x,8),z=scale;bg.fillStyle=x%2?'#3e9746':'#55a448';
+  for(let i=0;i<3;i++){bg.beginPath();bg.ellipse(p.x+(i-1)*4*z,p.y-7*z,3*z,5*z,0,0,Math.PI*2);bg.fill()}
+  bg.fillStyle='#f6d1df';bg.beginPath();bg.arc(p.x,p.y-11*z,2.5*z,0,Math.PI*2);bg.fill();
+ }
  // fences and planted trees around the neighborhood
  for(let i=0;i<34;i++){let x=(i*5+2)%LAND_GRID,y=(i*7+2)%LAND_GRID;if((x>8&&x<13)||(y===8))continue;drawTree(bg,x,y,0.8+(i%3)*.12)}
  // flower dots and shrubs
