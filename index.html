@@ -2,7 +2,7 @@
 <html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#f38db8"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="default">
-<link rel="manifest" href="manifest.webmanifest"><title>Our Springfield — Update 29</title>
+<link rel="manifest" href="manifest.webmanifest"><title>Our Springfield — Update 30</title>
 <style>
 :root{--pink:#f38db8;--plum:#76445f;--cream:#fff8ed;--ink:#382c36}
 *{box-sizing:border-box}body{margin:0;background:#d7e9ee;color:var(--ink);font-family:system-ui,-apple-system,sans-serif;overflow:hidden;height:100dvh}
@@ -112,7 +112,7 @@ nav{position:fixed;bottom:0;left:0;right:0;background:#fff9f1;border-top:1px sol
 .new-game-menu{display:block;margin:6px 0 12px;padding:9px 12px;background:#f6d7e4;border:2px solid #87506d;border-radius:10px;color:#57334a;font-weight:850;cursor:pointer;font-size:13px}
 .character-profile{display:flex;align-items:center;gap:12px;padding:10px;background:#fff8e7;border:2px solid #e6cf9c;border-radius:12px;margin-bottom:10px;color:#403126}.character-avatar{font-size:48px;min-width:64px;text-align:center}.character-profile p{font-size:12px;margin:5px 0 0;line-height:1.35}
 #update29Flag{position:fixed;top:10px;right:12px;z-index:99;background:#ffdc58;color:#32261d;border:2px solid #fff;border-radius:13px;padding:7px 11px;font-size:12px;font-weight:950;box-shadow:0 2px 7px #0004;pointer-events:none}
-</style></head><body><div id="update29Flag">UPDATE 29 · CARTOON TOWN</div>
+</style></head><body><div id="update29Flag">UPDATE 30 · CARTOON TOWN</div>
 <header><div class="brand">🍩 OUR SPRINGFIELD</div><div class="balances"><div class="pill">💵 ∞</div><div class="pill">🍩 ∞</div></div></header>
 <main>
 <div class="status"><div><span class="level" id="level">LEVEL 1</span><span class="xp"><i id="xpbar"></i></span> <small id="xptext">0 / 100 XP</small></div><strong id="townName">Your Town</strong></div>
@@ -257,7 +257,7 @@ if(localStorage.getItem(RESET_FLAG)!=='complete'){
  localStorage.setItem(RESET_FLAG,'complete');
 }
 let s=JSON.parse(localStorage.getItem('os_iso_save')||'null')||{town:'Your Town',level:1,xp:0,placed:[],tasks:{},quests:0,storyStage:0,storySeen:false};
-// Update 29: start with a real, visible neighborhood instead of an empty field.
+// Update 30: start with a real, visible neighborhood instead of an empty field.
 // Existing saved towns remain untouched.
 const update29NewTown=!localStorage.getItem('os_iso_save') && s.placed.length===0;
 const STORY=[
@@ -556,10 +556,10 @@ function residentSpeech(x,y,z,text){
  ctx.fillStyle='#3c3026';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(text,bx,by-height/2);ctx.restore();
 }
 function drawResident(c,x,y,index,walking=false,phase=0){
- const p=project(x,y),z=scale*2.05,skin='#f4cf45',outline='#3d3028';
+ const p=project(x,y),z=scale*2.65,skin='#f4cf45',outline='#3d3028';
  const reaction=residentReactions.get(c.name),reacting=reaction&&reaction.until>Date.now();
  const spriteId=['mayor','riley','casey','coach'][index%4];
- const drawn=paintedSprite(spriteId,p.x,p.y+8*z,Math.max(62,51*z),Math.max(92,76*z));
+ const drawn=paintedSprite(spriteId,p.x,p.y+8*z,Math.max(88,55*z),Math.max(128,82*z));
  if(drawn)return;
 
  const bob=walking?Math.abs(Math.sin(phase))*1.5*z:Math.sin(phase*.2)*.45*z;
@@ -612,13 +612,26 @@ function draw(){let W=canvas.clientWidth,H=canvas.clientHeight;if(!W||!H)return;
    ctx.font=`${Math.max(13,19*z)}px system-ui`;ctx.textAlign='center';ctx.fillStyle='#402b17';ctx.fillText('🔨',p.x,p.y-28*z);ctx.restore();
   }else if(b.buildEndsAt){const p=project(b.x+b.w/2,b.y+b.h/2);ctx.font=`${Math.max(15,20*scale)}px system-ui`;ctx.textAlign='center';ctx.fillText('✔️',p.x,p.y-28*scale)}
  });
+ // Update 30: add a lively, hand-drawn neighborhood around the starter cottage.
+ // These are visual decorations only: they do not bypass building unlocks or quests.
+ ctx.save();
+ for(const [gx,gy] of [[3.4,5.2],[7.5,5.3],[4.2,8.4],[8.2,7.9]]){
+  const q=project(gx,gy),z=scale;
+  ctx.lineWidth=Math.max(1.5,2*z);ctx.strokeStyle='#433a2a';
+  ctx.fillStyle='#e9d1a0';ctx.beginPath();ctx.ellipse(q.x,q.y,11*z,4*z,0,0,Math.PI*2);ctx.fill();
+  for(let k=0;k<5;k++){const a=k*Math.PI*2/5;ctx.strokeStyle='#2b7839';ctx.beginPath();ctx.moveTo(q.x,q.y);ctx.lineTo(q.x+Math.cos(a)*10*z,q.y+Math.sin(a)*5*z);ctx.stroke();ctx.fillStyle=['#ffcf4b','#f46c91','#ffffff'][k%3];ctx.beginPath();ctx.arc(q.x+Math.cos(a)*10*z,q.y+Math.sin(a)*5*z,3.3*z,0,Math.PI*2);ctx.fill()}
+ }
+ for(const [gx,gy] of [[3.2,6.6],[8.5,6.2]]){
+  const q=project(gx,gy),z=scale;ctx.lineWidth=3*z;ctx.strokeStyle='#403a2c';ctx.beginPath();ctx.moveTo(q.x,q.y);ctx.lineTo(q.x,q.y-39*z);ctx.stroke();ctx.fillStyle='#f6cf6b';ctx.strokeStyle='#403a2c';ctx.lineWidth=2*z;ctx.beginPath();ctx.moveTo(q.x-9*z,q.y-36*z);ctx.lineTo(q.x+9*z,q.y-36*z);ctx.lineTo(q.x+6*z,q.y-48*z);ctx.lineTo(q.x-6*z,q.y-48*z);ctx.closePath();ctx.fill();ctx.stroke();
+ }
+ ctx.restore();
  // Original hand-drawn cartoon residents, rendered at readable size in the actual town.
  const now=Date.now();
  visibleResidents=[];
  chars.filter(c=>isCharacterUnlocked(c)).forEach((c,i)=>{
   const busy=!!s.tasks[c.name]&&s.tasks[c.name].endsAt>now;
   const t=now/1000+i*2.3;
-  const homeX=5.5+(i%5)*1.6,homeY=6.7+Math.floor(i/5)*2.1;
+  const homeX=4.8+(i%5)*2.0,homeY=5.5+Math.floor(i/5)*2.0;
   // Residents follow short, looping neighborhood routes rather than vibrating in place.
   // Keep the route deterministic so it works without saving movement every frame.
   const route=[[0,0],[.85,0],[1.2,.65],[.4,1.05],[-.45,.65],[0,0]];

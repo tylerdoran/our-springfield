@@ -1,5 +1,4 @@
-OUR SPRINGFIELD UPDATE 29
-
-Upload index.html to the root of your GitHub Pages repository and replace the existing index.html.
-If you already have a saved town, it is preserved. New towns begin with a starter cottage and two residents.
-The yellow UPDATE 29 badge verifies you are running this version.
+OUR SPRINGFIELD — UPDATE 30
+Upload index.html to your GitHub Pages repository, replacing the existing index.html.
+Changes: larger cartoon residents, closer starting character routes, decorative flowers and streetlamps, Update 30 version label. Existing saved progress is not intentionally reset.
+Note: This update is not an exact copy of The Simpsons: Tapped Out and has not been browser-tested.
