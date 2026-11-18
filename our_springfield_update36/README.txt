@@ -1,0 +1,1 @@
+Our Springfield Update 36: camera focuses on the starter neighborhood on load. Use Find town to return to residents and buildings. Replace index.html in your GitHub Pages repository. Existing browser saves remain in localStorage.
